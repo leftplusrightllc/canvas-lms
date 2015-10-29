@@ -40,28 +40,15 @@
 <div id="application" <% if use_new_styles? %>class="ic-app"<% end %>>
   <noscript><div role="alert" class="ic-flash-static ic-flash-error"><h1><%= t :javascript_required, "You need to have JavaScript enabled in order to access this site." %></h1></div></noscript>
 
-  <% if @current_user.try(:show_bouncing_channel_message?) %>
-    <div role="alert" class="ic-flash-static ic-flash-warning">
-    <%= t(:bouncing_communication_channels, "There appears to be a problem with one of your contact methods. Please check your *Settings Page*.", wrapper: link_to('\1', settings_profile_path)) %>
-    </div>
-  <% end %>
-  <%# Begin alternate markup for K-12 Canvas header %>
-  <% if k12? %>
-  <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
-  <header id="header" class="canvas-header no-print <%= 'no-user' unless @current_user %>">
-    <div class="canvas-header__secondary">
-      <div class="canvas-logo-area">
-        <a class="canvas-logo-area__logo-link" href="<%= dashboard_url %>">
-          <span class="screenreader-only"><%= t 'links.dashboard', "My Dashboard" %></span>
-            <%= render(:partial => 'shared/svg/svg_canvas_logo.svg') %>
-        </a>
-      </div>
-      <div class="canvas-customer-area">
-        <div class="canvas-customer-area__content">
-          <%= @domain_root_account.display_name %>
-        </div>
-      </div>
-      <nav class="canvas-user-nav">
+  <% if use_new_styles? %>
+    <%= render(:partial => 'shared/new_nav_header') unless @headers == false %>
+  <% else %>
+    <%# Begin default Canvas header %>
+    <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
+      <div id="header-inner">
+        <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
+        <!-- <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> -->
+        <b id="header-logo-secondary"></b>
         <%= render(:partial => "shared/user_header_navigation") %>
       </nav>
     </div>
@@ -109,8 +96,19 @@
   <div id="wrapper-container" <% if use_new_styles? %>class="ic-app-container"<% end %>>
     <div id="wrapper" <% if use_new_styles? %>class="ic-app-main-layout-vertical"<% end %>>
       <% #Start new styles div %>
-      <% if use_new_styles? %><div class="ic-app-main-layout-horizontal"><% end %>
-        <% if @show_left_side %>
+
+      <% if crumbs.length > 1 && use_new_styles? %>
+        <div class="ic-app-nav-toggle-and-crumbs">
+          <% if @show_left_side %>
+            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button>
+            <div class="ic-app-crumbs">
+          <% end %>
+          <%= render_crumbs %>
+          <% if @show_left_side %></div><% end %>
+        </div>
+      <% end %>
+    <% if use_new_styles? %><div class="ic-app-main-layout-horizontal"><% end %>
+      <% if @show_left_side %>
           <div id="left-side" class="<% if !@no_left_side_list_view %>list-view<% end %> <% if use_new_styles? %>ic-app-course-menu<% end %>">
           <% if left_side %>
             <%= left_side %>
