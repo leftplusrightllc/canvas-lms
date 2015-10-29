@@ -259,6 +259,8 @@ class UserService < ActiveRecord::Base
         service_user_url
       when 'skype'
         "skype:#{service_user_name}?add"
+      when 'doorkeeper'
+        self.service_user_url
       else
         'http://www.instructure.com'
     end

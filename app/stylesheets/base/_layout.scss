@@ -127,7 +127,7 @@ body {
   @if $use_new_styles == false {
     background-color: $body-bg-color;
     border: none;
-    margin-bottom: 40px;
+    padding-bottom: 40px;
     @include pie-clearfix;
     min-height: 450px;
     max-width: $max_main_width;
@@ -206,7 +206,18 @@ body {
 // end classes applied to body
 
 #footer {
-  @if $use_new_styles == false {
+  background: #104074 none repeat scroll 0 0;
+  padding: 40px 0;
+  margin-left: 0 !important;
+  .header_wrapper{
+    margin: 0 auto;
+    max-width: 1000px;
+    position: relative;
+    a{
+      color: #9dcbef;
+    }
+  }
+  /*@if $use_new_styles == false {
     color: #5c5c5c;
     font-size: 11px;
     margin: 0 15px 34px;
@@ -218,7 +229,7 @@ body {
     height: 10px;
     margin: 0 20px 0 0;
     width: 140px;
-  }
+  }*/
 }
 @if $use_new_styles == false {
   #footer-links {
