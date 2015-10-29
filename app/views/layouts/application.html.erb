@@ -53,7 +53,7 @@
     <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
       <div id="header-inner">
         <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
-        <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
+        <!-- <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> -->
         <b id="header-logo-secondary"></b>
         <%= render(:partial => "shared/user_header_navigation") %>
         <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
@@ -76,7 +76,7 @@
       <% if crumbs.length > 1 && use_new_styles? %>
         <div class="ic-app-nav-toggle-and-crumbs">
           <% if @show_left_side %>
-            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button> 
+            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button>
             <div class="ic-app-crumbs">
           <% end %>
           <%= render_crumbs %>
