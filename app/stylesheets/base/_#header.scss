@@ -52,13 +52,53 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #header-inner {
-  padding-top: 26px;
-  max-width: $max_main_width;
+  padding-top: 40px;
+  //max-width: $max_main_width;
+  max-width: 100% !important;
   position: relative;
+  min-height: 80px;
+  background-color: #fbfdff;
+  background-image: linear-gradient(#fff, #fff 70%, #e9f5fe);
+  background-position: 0 bottom;
+  background-repeat: no-repeat;
+  #header-logo2 img{
+    margin-top: -6px;
+    width: 260px;
+  }
+  .header_menus{
+    background-color: #0b3a6d;
+    background-image: linear-gradient(to bottom, #0a3665, #0c4078);
+    background-repeat: repeat-x;
+    border-bottom: 3px solid #147ecd;
+    height: 37px;
+  }
 }
 
 #header {
-  @if $is-k12 or $use_new_styles == false {
+  #topbar{
+    background-color: #1077c4;
+    background-image: linear-gradient(to bottom, #147ecd, #0b6cb6);
+    background-repeat: repeat-x;
+    height: 29px;
+    a{
+      color: #9dcbef;
+      &:hover{
+        color: #f5fafd;
+      }
+    }
+  }
+  .header_wrapper{
+    margin: 0 auto;
+    max-width: 1000px;
+    position: relative;
+  }
+
+
+  #identity{
+    background: none;
+  }
+
+  @if $use_new_styles == false {
     position: relative;
     z-index: 11;
     background-color: $ic-header-background;
@@ -77,13 +117,13 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #topbar {
-  @if $is-k12 == false {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    overflow: hidden;
-  }
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+  background: red;
 }
 
 #identity {
@@ -93,7 +133,7 @@ $masquerade-link-color: $ic-color-alert;
     float: right;
     font-size: 12px;
     margin-right: $right_side_margin;
-    // make room for the drop shadow 
+    // make room for the drop shadow
     margin-bottom: 4px;
     padding: 0 11px;
     @if $use_high_contrast {
@@ -173,15 +213,9 @@ $masquerade-link-color: $ic-color-alert;
   #menu {
     @include pie-clearfix;
     @include reset-list;
-    @if $is-k12 {  
-      display: flex;
-      flex: 1;
-      height: $k12-header-primary-height;
-    }
-    @else {
-      padding-top: 3px;
-      margin-left: $left_side_width;  
-    }
+    padding-top: 3px;
+    position: absolute;
+    //margin-left: $left_side_width;
   }
 }
 
@@ -196,7 +230,7 @@ $masquerade-link-color: $ic-color-alert;
       @if $use_high_contrast { border-color: darken($brand-k12-dark, 15%); }
       @include breakpoint(desktop) { flex: 0 0 ($k12-sp * 14); }
       @include breakpoint(wide) { flex: 0 0 ($k12-sp * 16); }
-    }  
+    }
     @else {
       display: block;
       float: left;
@@ -217,7 +251,7 @@ $masquerade-link-color: $ic-color-alert;
         justify-content: center;
         color: $k12-header-text;
         @include breakpoint(desktop) { flex-direction: row; }
-      }    
+      }
       @else {
         color: #fff;
         border: 1px solid transparent;
@@ -234,7 +268,7 @@ $masquerade-link-color: $ic-color-alert;
     @if $use_new_styles == false {
       &:hover, &:focus { text-decoration: underline; }
     }
-    
+
     @if $is-k12 {
       &:hover, &:focus {
         background: rgba($k12-header-text, 0.15);
@@ -258,7 +292,7 @@ $masquerade-link-color: $ic-color-alert;
           @if $use_high_contrast == false {
             text-decoration: none;
           }
-        }      
+        }
         @else {
           color: $course-dropdown-text-color;
           border-top-color: darken($ic-brand-secondary, 12%);
@@ -270,10 +304,10 @@ $masquerade-link-color: $ic-color-alert;
     }
     @if $use_new_styles == false {
       // bring it back on screen so you can see it
-      .menu-item-drop { left: 0; } 
+      .menu-item-drop { left: 0; }
     }
   }
-  
+
   .menu-item-drop {
     font-size: 13px;
     // hide off screen, dont do display:none, so screenreaders can see it
@@ -506,4 +540,7 @@ $masquerade-link-color: $ic-color-alert;
 .customListGhost {
   position: absolute;
   z-index: 100;
+}
+body.no-headers{
+  display: none !important;
 }

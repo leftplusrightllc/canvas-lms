@@ -54,6 +54,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       GitHub
     when 'linkedin'
       LinkedIn
+    when 'doorkeeper'
+      Doorkeeper
     when 'openid_connect'
       OpenIDConnect
     else
@@ -82,7 +84,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   has_many :pseudonyms, foreign_key: :authentication_provider_id
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
-  VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze
+  VALID_AUTH_TYPES = %w[canvas cas facebook github google ldap linkedin openid_connect saml twitter doorkeeper].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
 
