@@ -53,12 +53,19 @@
   <% else %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
     <div id="header-inner">
-      <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
-      <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
-      <b id="header-logo-secondary"></b>
       <%= render(:partial => "shared/user_header_navigation") %>
-      <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-      <%= render(:partial => "shared/primary_header_navigation") %>
+      <div class="header_wrapper">
+          <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
+          <!--<a id="header-logo" href="<%#= dashboard_url %>"><%#= t 'links.dashboard', "My Dashboard" %></a>-->
+          <a id="header-logo2" href="<%= dashboard_url %>"><%= image_tag("//hsfdev.com/assets/40th-anniversary-logo-en.png") %></a>
+          <b id="header-logo-secondary2"></b>
+      </div>
+      <div class="header_menus">
+          <div class="header_wrapper">
+              <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
+              <%= render(:partial => "shared/primary_header_navigation") %>
+          </div>
+      </div>
     </div>
   </div>
   <%# End default Canvas header %>
