@@ -33,6 +33,16 @@ Canvas::Plugin.register('linked_in', nil,
   validator: 'LinkedInValidator',
   encrypted_settings: [:client_secret]
                        )
+Canvas::Plugin.register('doorkeeper', nil,
+                        name: 'Doorkeeper',
+                        description: -> { t :description, 'Doorkeeper Login' },
+                        website: DoorkeeperConfig[:site],
+                        author: DoorkeeperConfig[:author],
+                        author_website: DoorkeeperConfig[:author_url],
+                        version: DoorkeeperConfig[:version],
+                        settings_partial: 'plugins/doorkeeper_settings',
+                        encrypted_settings: [:client_secret]
+)
 Canvas::Plugin.register('diigo', nil, {
   :name => lambda{ t :name, 'Diigo' },
   :description => lambda{ t :description, 'Diigo integration' },
