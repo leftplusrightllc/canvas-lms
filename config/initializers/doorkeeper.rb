@@ -15,15 +15,15 @@ DoorkeeperConfigDev = {
     }
 
 DoorkeeperConfig = {
-      site: 'https://canvas.hsf.net'.freeze, # url of the doorkeeper site
-      authorize_url: 'https://canvas.hsf.net/oauth/authorize', # url of the doorkeeper site to authorize login
-      token_url: 'https://canvas.hsf.net/oauth/token', # # url of the doorkeeper for token
-      profile_url: "https://canvas.hsf.net/users/{user_id}/profile/", # url of the doorkeeper site where to see the user profile
-      domain: "canvas.hsf.net", # domain of the doorkeeper site
+      site: 'https://university.hsf.net'.freeze, # url of the doorkeeper site
+      authorize_url: 'https://university.hsf.net/oauth/authorize', # url of the doorkeeper site to authorize login
+      token_url: 'https://university.hsf.net/oauth/token', # # url of the doorkeeper for token
+      profile_url: "https://university.hsf.net/users/{user_id}/profile/", # url of the doorkeeper site where to see the user profile
+      domain: "university.hsf.net", # domain of the doorkeeper site
       canvas_token: 'W7o2NJfhNEIHWCa7t6KlgwCceD4W2cdn3CookZYh5kotBShbxoZ0Y0IoeVFknAP2', # developer token generated in canvas lms
       default_pass: "^&*^&*^&*^&*^&*^*^&*^&*^&*^&*^$%^#@^%&*", # default pass for new users created by doorkeeper
       user_id_owner_accounts: 1, # profile id who will be the owner of new users created by doorkeeper
-      logout_url: "https://canvas.hsf.net/en/users/sign_out?redirect_url={canvas_login_url}", # url redirected after logout
+      logout_url: "https://university.hsf.net/en/users/sign_out?redirect_url={canvas_login_url}", # url redirected after logout
       author: "hsf",
       author_url: "",
       version: "0.0.1",
