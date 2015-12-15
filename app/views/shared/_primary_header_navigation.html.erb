@@ -6,9 +6,14 @@
       <%= render(:partial => 'shared/home_menu') %>
     </li>
     <%- end -%>
-    <li id="grades_menu_item" class="menu-item">
-      <a href="<%= grades_path %>" class="menu-item-no-drop">
-        <%= t('menu.grades', 'Grades') %>
+    <!--<li id="grades_menu_item" class="menu-item">-->
+      <!--<a href="<%= grades_path %>" class="menu-item-no-drop">-->
+        <!--<%= t('menu.grades', 'Grades') %>-->
+      <!--</a>-->
+    <!--</li>-->
+    <li id="all_courses_menu_item" class="menu-item">
+      <a href="<%= search_all_courses_path %>" class="menu-item-no-drop">
+        <%= t('menu.browse_courses', 'Browse Courses') %>
       </a>
     </li>
     <li id="calendar_menu_item" class="menu-item">

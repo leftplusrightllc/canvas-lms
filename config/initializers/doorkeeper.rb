@@ -1,4 +1,5 @@
-DoorkeeperConfigDev = {
+Context_default_quota = 500.megabytes
+DoorkeeperConfig = {
       site: 'http://my.lvh.me:8082'.freeze, # url of the doorkeeper site
       authorize_url: 'http://my.lvh.me:8082/oauth/authorize', # url of the doorkeeper site to authorize login
       token_url: 'http://my.lvh.me:8082/oauth/token', # # url of the doorkeeper for token
@@ -11,7 +12,7 @@ DoorkeeperConfigDev = {
       author: "hsf",
       author_url: "",
       version: "0.0.1",
-      my_oauth_applications_url: "https://owen.com:3001/oauth/applications" # url of the doorkeeper site where to create applications
+      my_oauth_applications_url: "https://owen.com:3000/oauth/applications" # url of the doorkeeper site where to create applications
     }
 
 DoorkeeperConfig = {
@@ -30,6 +31,7 @@ DoorkeeperConfig = {
       my_oauth_applications_url: "https://hsf.net/oauth/applications" # url of the doorkeeper site where to create applications
     }
 
+# local: rvm use 2.2.2
 # Installation:
 # Install canvas lms
 # Create the doorkeeper oauth application (client id, client secret) in http://mydomain/oauth/applications, your callback must be like this: http://<mydomain-canvas>/login/oauth2/callback
