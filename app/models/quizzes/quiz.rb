@@ -352,9 +352,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     return false unless self.show_correct_answers
 
-    quiz_submission = user.present? && user.quiz_submissions.where(quiz_id: self.id).first
-    if self.show_correct_answers_last_attempt && quiz_submission
-      return quiz_submission.attempts_left == 0 && quiz_submission.completed?
+    if self.show_correct_answers_last_attempt && submission
+      return submission.attempts_left == 0 && submission.completed?
     end
 
     # If we're showing the results only one time, and are letting students
@@ -616,7 +615,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
 
     can_take = Quizzes::QuizEligibility.new(course: self.context, quiz: self, user: submission.user)
-    
+
     fallback_end_at = if can_take.section_dates_currently_apply?
       can_take.course_section.end_at
     elsif course.restrict_enrollments_to_course_dates
@@ -624,7 +623,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     else
       course.enrollment_term.end_at
     end
-    
+
     # set to lock date
     if lock_at && !submission.manually_unlocked
       if !end_at || lock_at < end_at
@@ -633,7 +632,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     elsif !end_at || (fallback_end_at && fallback_end_at < end_at)
       end_at = fallback_end_at
     end
-    
+
     end_at
   end
 
@@ -818,12 +817,30 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def check_if_submissions_need_review
-    self.quiz_submissions.each { |s| s.update_if_needs_review(self) }
+    self.connection.after_transaction_commit do
+      version_num = self.version_number
+      submissions_to_update = []
+      self.quiz_submissions.each do |sub|
+        next unless sub.completed?
+
+        next if sub.quiz_version && sub.quiz_version >= version_num
+
+        if self.changed_significantly_since?(sub.quiz_version)
+          submissions_to_update << sub
+        end
+      end
+
+      if submissions_to_update.any?
+        self.shard.activate do
+          Quizzes::QuizSubmission.where(:id => submissions_to_update).update_all(:workflow_state => 'pending_review', :updated_at => Time.now.utc)
+        end
+      end
+    end
   end
 
   def changed_significantly_since?(version_number)
     @significant_version ||= {}
-    return @significant_version[version_number] if @significant_version[version_number]
+    return @significant_version[version_number] if @significant_version.has_key?(version_number)
     old_version = self.versions.get(version_number).model
 
     needs_review = false

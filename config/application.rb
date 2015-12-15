@@ -118,7 +118,11 @@ module CanvasRails
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
       app.config.middleware.insert_before(config.session_store, 'LoadAccount')
       app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
-      app.config.middleware.swap('ActionDispatch::RequestId', "RequestContextGenerator")
+      if CANVAS_RAILS3
+        app.config.middleware.insert_before('ActionDispatch::Flash', 'Rails3FlashShim')
+      end
+      app.config.middleware.swap('ActionDispatch::RequestId', 'RequestContextGenerator')
+      app.config.middleware.insert_after(config.session_store, 'RequestContextSession')
       app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
       app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
     end

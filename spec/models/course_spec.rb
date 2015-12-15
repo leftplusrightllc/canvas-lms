@@ -3178,11 +3178,13 @@ describe Course, "section_visibility" do
     it "should return student view students to account admins" do
       @course.student_view_student
       @admin = account_admin_user
-      expect(@course.enrollments_visible_to(@admin).map(&:user)).to be_include(@course.student_view_student)
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
+      expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
 
     it "should return student view students to student view students" do
-      expect(@course.enrollments_visible_to(@course.student_view_student).map(&:user)).to be_include(@course.student_view_student)
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @course.student_view_student)
+      expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
   end
 
@@ -3196,7 +3198,7 @@ describe Course, "section_visibility" do
     end
 
     it "should return non-limited admins from other sections" do
-      expect(@course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true)).to eq [@teacher]
+      expect(@course.apply_enrollment_visibility(@course.teachers, @ta)).to eq [@teacher]
     end
   end
 
@@ -4045,10 +4047,27 @@ describe Course do
       dm_count = DelayedMessage.count
       expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 0
       Notification.create!(:name => 'Enrollment Invitation')
-      @course.re_send_invitations!
+      @course.re_send_invitations!(@teacher)
 
       expect(DelayedMessage.count).to eq dm_count + 1
       expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 1
+    end
+
+    it "should respect section restrictions" do
+      course(:active_all => true)
+      section2 = @course.course_sections.create! :name => 'section2'
+      user1 = user_with_pseudonym(:active_all => true)
+      user2 = user_with_pseudonym(:active_all => true)
+      ta = user_with_pseudonym(:active_all => true)
+      @course.enroll_student(user1)
+      @course.enroll_student(user2, :section => section2)
+      @course.enroll_ta(ta, :active_all => true, :section => section2, :limit_privileges_to_course_section => true)
+
+      Notification.create!(:name => 'Enrollment Invitation')
+      @course.re_send_invitations!(ta)
+
+      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channel).count).to eq 0
+      expect(DelayedMessage.where(:communication_channel_id => user2.communication_channel).count).to eq 1
     end
   end
 
@@ -4276,5 +4295,37 @@ describe Course, '#module_items_visible_to' do
   it "shows all items to teachers even when course is concluded" do
     @course.complete!
     expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+end
+
+describe Course, '#update_enrolled_users' do
+  it "should update user associations when deleted" do
+    course_with_student(:active_all => true)
+    expect(@user.associated_accounts).to be_present
+    @course.destroy
+    @user.reload
+    expect(@user.associated_accounts).to be_blank
+  end
+end
+
+describe Course, "#apply_nickname_for!" do
+  before(:once) do
+    @course = Course.create! :name => 'some terrible name'
+    @user = User.new
+    @user.course_nicknames[@course.id] = 'nickname'
+    @user.save!
+  end
+
+  it "sets name to user's nickname (non-persistently)" do
+    @course.apply_nickname_for!(@user)
+    expect(@course.name).to eq 'nickname'
+    @course.save!
+    expect(Course.find(@course).name).to eq 'some terrible name'
+  end
+
+  it "undoes the change with nil user" do
+    @course.apply_nickname_for!(@user)
+    @course.apply_nickname_for!(nil)
+    expect(@course.name).to eq 'some terrible name'
   end
 end

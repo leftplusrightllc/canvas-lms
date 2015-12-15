@@ -151,21 +151,34 @@ class ApplicationController < ActionController::Base
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
-    tools = ContextExternalTool.all_tools_for(context, {:type => type,
+    tools = ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user})
 
-    extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
-      hash = {
-          :title => tool.label_for(type, I18n.locale),
-          :base_url => named_context_url(context, :context_external_tool_path, tool, :launch_type => type)
-      }
-      extension_settings.each do |setting|
-        hash[setting] = tool.extension_setting(type, setting)
-      end
-      hash
+      external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
   end
+
+  def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
+
+    url_params = {
+      id: tool.id,
+      launch_type: type
+    }.merge(url_params)
+
+    hash = {
+      :title => tool.label_for(type, I18n.locale),
+      :base_url =>  polymorphic_url([context, :external_tool], url_params),
+      :is_new => tool.integration_type == 'lor'
+    }
+
+    extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
+    extension_settings.each do |setting|
+      hash[setting] = tool.extension_setting(type, setting)
+    end
+    hash
+  end
+  helper_method :external_tool_display_hash
 
   def k12?
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
@@ -204,6 +217,10 @@ class ApplicationController < ActionController::Base
   # docs for masqueraders earlier in the request
   def logged_in_user
     @real_current_user || @current_user
+  end
+
+  def not_fake_student_user
+    @current_user && @current_user.fake_student? ? logged_in_user : @current_user
   end
 
   def rescue_action_dispatch_exception
@@ -247,7 +264,7 @@ class ApplicationController < ActionController::Base
   def assign_localizer
     I18n.localizer = lambda {
       infer_locale :context => @context,
-                   :user => logged_in_user,
+                   :user => not_fake_student_user,
                    :root_account => @domain_root_account,
                    :session_locale => session[:locale],
                    :accept_language => request.headers['Accept-Language']
@@ -291,7 +308,7 @@ class ApplicationController < ActionController::Base
 
   # scopes all time objects to the user's specified time zone
   def set_time_zone
-    user = logged_in_user
+    user = not_fake_student_user
     if user && !user.time_zone.blank?
       Time.zone = user.time_zone
       if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
@@ -339,14 +356,14 @@ class ApplicationController < ActionController::Base
       super
   end
 
-  def tab_enabled?(id)
+  def tab_enabled?(id, opts = {})
     return true unless @context && @context.respond_to?(:tabs_available)
     tabs = @context.tabs_available(@current_user,
                                    :session => session,
                                    :include_hidden_unused => true,
                                    :root_account => @domain_root_account)
     valid = tabs.any?{|t| t[:id] == id }
-    render_tab_disabled unless valid
+    render_tab_disabled unless valid || opts[:no_render]
     return valid
   end
 
@@ -412,6 +429,13 @@ class ApplicationController < ActionController::Base
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
+        if ms_office?
+          # Office will follow 302's internally, until it gets to a 200. _then_ it will pop it out
+          # to a web browser - but you've lost your cookies! This breaks not only store_location,
+          # but in the case of delegated authentication where the provider does an additional
+          # redirect storing important information in session, makes it impossible to log in at all
+          return render text: '', status: 200
+        end
         store_location
         return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 
@@ -488,17 +512,9 @@ class ApplicationController < ActionController::Base
         @context = api_find(Course.active, params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
-        if @context && session[:enrollment_uuid_course_id] == @context.id
-          session[:enrollment_uuid_count] ||= 0
-          if session[:enrollment_uuid_count] > 4
-            session[:enrollment_uuid_count] = 0
-            self.extend(TextHelper)
-            flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment", "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
-          end
-          session[:enrollment_uuid_count] += 1
-        end
         @context_enrollment = @context.enrollments.where(user_id: @current_user).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
         @context_membership = @context_enrollment
+        check_for_readonly_enrollment_state
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
         @context = api_find(Account, params[:account_id])
         params[:context_id] = @context.id
@@ -546,7 +562,7 @@ class ApplicationController < ActionController::Base
 
         if @context && @context.respond_to?(:short_name)
           crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
-          add_crumb(@context.short_name, crumb_url)
+          add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
         end
 
         @set_badge_counts = true
@@ -614,6 +630,25 @@ class ApplicationController < ActionController::Base
     Course.require_assignment_groups(@contexts)
     @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
     @context_membership = @context_enrollment
+  end
+
+  def check_for_readonly_enrollment_state
+    if @context_enrollment && @context_enrollment.is_a?(Enrollment) && ['invited', 'active'].include?(@context_enrollment.workflow_state) && action_name != "enrollment_invitation"
+      state = @context_enrollment.state_based_on_date
+      case state
+      when :invited
+        if @context_enrollment.available_at
+          flash[:html_notice] = mt "#application.notices.need_to_accept_future_enrollment",
+            "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course, starting on %{date}.",
+            :url => course_url(@context),:date => datetime_string(@context_enrollment.available_at)
+        else
+          flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment",
+            "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
+        end
+      when :accepted
+        flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.", :date => datetime_string(@context_enrollment.available_at))
+      end
+    end
   end
 
   def set_badge_counts_for(context, user, enrollment=nil)
@@ -1045,13 +1080,19 @@ class ApplicationController < ActionController::Base
       type = nil
       type = '404' if status == '404 Not Found'
 
+      # TODO: get rid of exceptions that implement this "skip_error_report?" thing, instead
+      # use the initializer in config/initializers/errors.rb to configure
+      # exceptions we want skipped
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
         opts = {type: type}
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
         error_info[:tags][:response_code] = response_code
         capture_outputs = Canvas::Errors.capture(exception, error_info)
-        error = ErrorReport.find(capture_outputs[:error_report])
+        error = nil
+        if capture_outputs[:error_report]
+          error = ErrorReport.find(capture_outputs[:error_report])
+        end
       end
 
       if api_request?
@@ -1819,6 +1860,10 @@ class ApplicationController < ActionController::Base
 
   def mobile_device?
     params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
+  end
+
+  def ms_office?
+    request.user_agent.to_s =~ /ms-office/
   end
 
   def profile_data(profile, viewer, session, includes)

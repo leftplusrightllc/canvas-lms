@@ -1,10 +1,14 @@
 module CC::Exporter::Epub::Converters
   class CartridgeConverter < Canvas::Migration::Migrator
+    include CC::CCHelper
     include Canvas::Migration::XMLHelper
     include WikiEpubConverter
     include AssignmentEpubConverter
     include TopicEpubConverter
     include QuizEpubConverter
+    include ModuleEpubConverter
+    include FilesConverter
+    include MediaConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -13,11 +17,41 @@ module CC::Exporter::Epub::Converters
       super(settings, "cc")
       @course = @course.with_indifferent_access
       @resources = {}
+      @course[:syllabus] = []
       @resource_nodes_for_flat_manifest = {}
+      @unsupported_files = []
+    end
+    attr_reader :unsupported_files
+
+    def convert_placeholder_paths_from_string!(html_string)
+      html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
+      html_node.tap do |node|
+        convert_media_from_node!(node)
+        remove_empty_ids!(node)
+      end
+      html_node.to_s
     end
 
-    def export_directory
-      File.dirname(@archive.file)
+    def remove_empty_ids!(node)
+      node.search("a[id='']").each do |tag|
+        tag.remove_attribute('id')
+      end
+      node
+    end
+
+    def update_syllabus(content)
+      return unless content[:identifier]
+      @course[:syllabus] << {
+        title: content[:title],
+        identifier: content[:identifier],
+        due_at: content[:due_at],
+        href: content[:href]
+      }
+    end
+
+    def organize_syllabus
+      due_anytime, has_due_date = @course[:syllabus].partition { |item| item[:due_at].nil? }
+      @course[:syllabus] = has_due_date.sort_by{|item| item[:due_at]} + due_anytime
     end
 
     # exports the package into the intermediary json
@@ -29,16 +63,22 @@ module CC::Exporter::Epub::Converters
       get_all_resources(@manifest)
 
       @course[:title] = get_node_val(@manifest, "string")
+      @course[:files], @unsupported_files = convert_files
+
       set_progress(10)
       @course[:wikis] = convert_wikis
       set_progress(20)
       @course[:assignments] = convert_assignments
       set_progress(30)
-      @course[:discussion_topics] = convert_topics
+      @course[:topics] = convert_topics
       set_progress(40)
       @course[:quizzes] = convert_quizzes
+      set_progress(50)
+      @course[:modules] = convert_modules
+      set_progress(60)
 
       save_to_file
+      organize_syllabus
       set_progress(90)
       delete_unzipped_archive
       @course

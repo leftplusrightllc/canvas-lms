@@ -511,6 +511,8 @@ describe User do
       @course5.enroll_user(@user, 'TeacherEnrollment')
 
       @course6 = course(:course_name => "active but date restricted", :active_course => true)
+      @course6.restrict_student_future_view = true
+      @course6.save!
       e = @course6.enroll_user(@user, 'StudentEnrollment')
       e.accept!
       e.start_at = 1.day.from_now
@@ -524,7 +526,6 @@ describe User do
       e.end_at = 1.day.ago
       e.save!
 
-
       # only four, in the right order (type, then name), and with the top type per course
       expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eql [
         [@course5.id, 'TeacherEnrollment'],
@@ -532,6 +533,18 @@ describe User do
         [@course3.id, 'TeacherEnrollment'],
         [@course1.id, 'StudentEnrollment']
       ]
+    end
+
+    it "includes invitations to temporary users" do
+      user1 = user
+      user2 = user
+      c1 = course(name: 'a', active_course: true)
+      e = c1.enroll_teacher(user1)
+      user2.stubs(:temporary_invitations).returns([e])
+      c2 = course(name: 'b', active_course: true)
+      c2.enroll_user(user2)
+
+      expect(user2.courses_with_primary_enrollment.map(&:id)).to eq [c1.id, c2.id]
     end
 
     describe 'with cross sharding' do
@@ -1198,16 +1211,27 @@ describe User do
       expect(User.name_parts('Cody Cutrer')).to eq ['Cody', 'Cutrer', nil]
       expect(User.name_parts('  Cody  Cutrer   ')).to eq ['Cody', 'Cutrer', nil]
       expect(User.name_parts('Cutrer, Cody')).to eq ['Cody', 'Cutrer', nil]
+      expect(User.name_parts('Cutrer, Cody',
+                             likely_already_surname_first: true)).to eq ['Cody', 'Cutrer', nil]
       expect(User.name_parts('Cutrer, Cody Houston')).to eq ['Cody Houston', 'Cutrer', nil]
+      expect(User.name_parts('Cutrer, Cody Houston',
+                             likely_already_surname_first: true)).to eq ['Cody Houston', 'Cutrer', nil]
       expect(User.name_parts('St. Clair, John')).to eq ['John', 'St. Clair', nil]
+      expect(User.name_parts('St. Clair, John',
+                             likely_already_surname_first: true)).to eq ['John', 'St. Clair', nil]
       # sorry, can't figure this out
       expect(User.name_parts('John St. Clair')).to eq ['John St.', 'Clair', nil]
       expect(User.name_parts('Jefferson Thomas Cutrer IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
       expect(User.name_parts('Jefferson Thomas Cutrer, IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
       expect(User.name_parts('Cutrer, Jefferson, IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson, IV',
+                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
       expect(User.name_parts('Cutrer, Jefferson IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson IV',
+                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
       expect(User.name_parts(nil)).to eq [nil, nil, nil]
       expect(User.name_parts('Bob')).to eq ['Bob', nil, nil]
+      expect(User.name_parts('Ho, Chi, Min')).to eq ['Chi Min', 'Ho', nil]
       expect(User.name_parts('Ho, Chi, Min')).to eq ['Chi Min', 'Ho', nil]
       # sorry, don't understand cultures that put the surname first
       # they should just manually specify their sort name
@@ -1215,10 +1239,17 @@ describe User do
       expect(User.name_parts('')).to eq [nil, nil, nil]
       expect(User.name_parts('John Doe')).to eq ['John', 'Doe', nil]
       expect(User.name_parts('Junior')).to eq ['Junior', nil, nil]
-      expect(User.name_parts('John St. Clair', 'St. Clair')).to eq ['John', 'St. Clair', nil]
-      expect(User.name_parts('John St. Clair', 'Cutrer')).to eq ['John St.', 'Clair', nil]
-      expect(User.name_parts('St. Clair', 'St. Clair')).to eq [nil, 'St. Clair', nil]
+      expect(User.name_parts('John St. Clair', prior_surname: 'St. Clair')).to eq ['John', 'St. Clair', nil]
+      expect(User.name_parts('John St. Clair', prior_surname: 'Cutrer')).to eq ['John St.', 'Clair', nil]
+      expect(User.name_parts('St. Clair', prior_surname: 'St. Clair')).to eq [nil, 'St. Clair', nil]
       expect(User.name_parts('St. Clair,')).to eq [nil, 'St. Clair', nil]
+      # don't get confused by given names that look like suffixes
+      expect(User.name_parts('Duing, Vi')).to eq ['Vi', 'Duing', nil]
+      # we can't be perfect. don't know what to do with this
+      expect(User.name_parts('Duing Chi Min, Vi')).to eq ['Duing Chi', 'Min', 'Vi']
+      # unless we thought it was already last name first
+      expect(User.name_parts('Duing Chi Min, Vi',
+                             likely_already_surname_first: true)).to eq ['Vi', 'Duing Chi Min', nil]
     end
 
     it "should keep the sortable_name up to date if all that changed is the name" do
@@ -2389,6 +2420,34 @@ describe User do
         expect(@teacher.assignments_needing_grading.length).to eq 3
       end
     end
+
+    context "#assignments_needing_moderation" do
+      before :once do
+        @course2.account.allow_feature!(:moderated_grading)
+        @course2.enable_feature!(:moderated_grading)
+        @course2.assignments.first.update_attribute(:moderated_grading, true)
+      end
+
+      it "should not count assignments with no provisional grades" do
+        expect(@teacher.assignments_needing_moderation.length).to eq 0
+      end
+
+      it "should count assignments needing moderation" do
+        assmt = @course2.assignments.first
+        assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
+        expect(@teacher.assignments_needing_moderation.length).to eq 1
+
+        assmt.update_attribute(:grades_published_at, Time.now.utc)
+        expect(@teacher.assignments_needing_moderation.length).to eq 0 # should not count anymore once grades are published
+      end
+
+      it "should not give a count for non-moderators" do
+        assmt = @course2.assignments.first
+        assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
+        ta = ta_in_course(:course => @course, :active_all => true).user
+        expect(ta.assignments_needing_moderation.length).to eq 0
+      end
+    end
   end
 
   describe ".initial_enrollment_type_from_type" do
@@ -2862,6 +2921,11 @@ describe User do
     it "includes 'teacher' if the user has a designer enrollment" do
       @enrollment = @course.enroll_user(@user, 'DesignerEnrollment', enrollment_state: 'active')
       expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'observer' if the user has an observer enrollment" do
+      @enrollment = @course.enroll_user(@user, 'ObserverEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user observer]
     end
 
     it "includes 'admin' if the user has an admin user record" do

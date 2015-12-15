@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'jquery',
   'react',
@@ -24,9 +22,9 @@ define([
     },
 
     componentDidUpdate: function() {
-      $.ajaxJSON(this.url, 'POST', {}, function() {
-        window.location = '/'
-      });
+      $('#dashboard-activity').toggle();
+      $('#DashboardCard_Container').toggle();
+      $.ajaxJSON(this.url, 'POST');
     },
 
     render: function() {

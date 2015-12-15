@@ -57,7 +57,7 @@ module Api::V1::User
           json[:login_id] = pseudonym.unique_id
         end
       end
-      if service_enabled?(:avatars) && includes.include?('avatar_url')
+      if user.account.service_enabled?(:avatars) && includes.include?('avatar_url')
         json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
       end
       if enrollments
@@ -65,7 +65,7 @@ module Api::V1::User
       end
       # include a permissions check here to only allow teachers and admins
       # to see user email addresses.
-      if includes.include?('email') && context.grants_right?(current_user, session, :read_as_admin)
+      if includes.include?('email') && context.grants_right?(current_user, session, :read_roster)
         json[:email] = user.email
       end
 
@@ -135,12 +135,14 @@ module Api::V1::User
       else
         polymorphic_url([parent_context, user])
       end
-    return {
+    hash = {
       id: user.id,
       display_name: user.short_name,
       avatar_image_url: avatar_url_for_user(user, blank_fallback),
       html_url: participant_url
     }
+    hash[:fake_student] = true if user.fake_student?
+    hash
   end
 
   # optimization hint, currently user only needs to pull pseudonyms from the db
@@ -194,8 +196,13 @@ module Api::V1::User
 
         if has_grade_permissions?(user, enrollment)
           if opts[:grading_period]
+            student_id = user.id
+            if enrollment.is_a? StudentEnrollment
+              student_id = enrollment.student.id
+            end
+
             course = enrollment.course
-            gc = GradeCalculator.new(user.id, course,
+            gc = GradeCalculator.new(student_id, course,
                                      grading_period: opts[:grading_period])
             ((current, _), (final, _)) = gc.compute_scores.first
             json[:grades][:current_score] = current[:grade]

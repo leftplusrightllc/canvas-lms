@@ -1,5 +1,6 @@
 @import "base/environment";
-
+@import "components/ic-range-input";
+@import "components/ProgressBar";
 
 //// Vertical content alignment on elements in Theme editor
 ///////
@@ -166,12 +167,10 @@ $te-width: 300px;
   .Theme__editor-tabs_item {
     color: $te-tab-text-color;
     padding: $ic-sp;
-    display: inline-block;
     font-size: 14px;
     margin: 0;
     cursor: pointer;
     font-weight: normal;
-    vertical-align: 0;
 
     &:hover, &:focus {
       color: $te-tab-text-color-hover;
@@ -184,12 +183,8 @@ $te-width: 300px;
     top: 0; left: 0;
   }
 
-  .Theme__editor-tabs_panel {
-    border-top: 1px solid $te-border-color;
-  }
-
-  #te-editor:checked ~ #te-editor-tab,
-  #te-upload:checked ~ #te-upload-tab {
+  #te-editor:checked ~ .Theme__editor-tab-label-layout #te-editor-tab,
+  #te-upload:checked ~ .Theme__editor-tab-label-layout #te-upload-tab {
      position: relative;
      cursor: default;
 
@@ -199,7 +194,7 @@ $te-width: 300px;
       width: 0; height: 0;
       border-bottom-color: lighten($ic-color-dark, 20);
       position: absolute;
-      bottom: 0;
+      bottom: -1px;
       left: 0; right: 0;
       margin: 0 auto;
     }
@@ -209,7 +204,7 @@ $te-width: 300px;
     }
   }
 
-  #te-upload:checked ~ #te-upload-tab:before {
+  #te-upload:checked ~ .Theme__editor-tab-label-layout #te-upload-tab:before {
     border-bottom-color: $te-bgd;
   }
 
@@ -221,6 +216,11 @@ $te-width: 300px;
   .Theme__editor-tabs_item ~ .Theme__editor-tabs_panel {
     border: none;
   }
+}
+
+.Theme__editor-tab-label-layout {
+  display: flex;
+  justify-content: space-around;
 }
 
 
@@ -238,7 +238,6 @@ $te-width: 300px;
 
   .Theme__editor-upload-overrides_form {
     background: $te-content-bgd;
-    color: $ic-color-light;
   }
 }
 
@@ -280,6 +279,12 @@ $te-width: 300px;
   }
 
   @if $use_high_contrast == false { outline: none; }
+}
+
+
+.ThemeEditorFileUpload__view-file {
+  float: right;
+  font-weight: normal;
 }
 
 //// Accordion styles for Theme Editor
@@ -588,16 +593,24 @@ $te-width: 300px;
   }
 }
 
-.ReactModal__Overlay--Theme__editor_progress {
-  background-color: transparentize($ic-color-light, .2);
+.Theme-editor-progress-list-item {
+  margin: 0;
+  line-height: 1.2;
+  padding: $ic-sp 0;
+  border-top: 1px solid $ic-border-light;
+  display: flex;
+  align-items: center;
+
+  &:first-of-type { border-top: none; }
 }
 
-@import "components/ProgressBar";
-.Theme__editor_progress {
-  width: 300px;
-  text-align: center;
-  color: ensure-contrast($ic-color-dark, $ic-color-light, true);
-  .progress-bar__bar-container {
-    background-color: $ic-color-light;
-  }
+.Theme-editor-progress-list-item__title {
+  flex: 0 0 36%;
+  padding-right: $ic-sp*2;
+  font-size: $baseFontSize;
+  font-weight: 500;
+}
+
+.Theme-editor-progress-list-item__bar {
+  flex: 1;
 }

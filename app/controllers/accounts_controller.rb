@@ -167,6 +167,9 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
       format.html do
+        if value_to_boolean(params[:theme_applied])
+          flash[:notice] = t("Your custom theme has been successfully applied.")
+        end
         return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, :read_course_list)
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
@@ -559,6 +562,7 @@ class AccountsController < ApplicationController
 
       @announcements = @account.announcements
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
+
       js_env({
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         ENABLE_LTI2: @account.root_account.feature_enabled?(:lti2_ui),
@@ -722,7 +726,7 @@ class AccountsController < ApplicationController
 
   def avatars
     if authorized_action(@account, @current_user, :manage_admin_users)
-      @users = @account.all_users
+      @users = @account.all_users(nil)
       @avatar_counts = {
         :all => format_avatar_count(@users.with_avatar_state('any').count),
         :reported => format_avatar_count(@users.with_avatar_state('reported').count),

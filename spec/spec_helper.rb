@@ -117,6 +117,7 @@ module RSpec::Rails
 
         real_controller = controller_class.new
         real_controller.instance_variable_set(:@_request, @controller.request)
+        real_controller.instance_variable_set(:@context, @controller.instance_variable_get(:@context))
         @controller.real_controller = real_controller
 
         # just calling "render 'path/to/view'" by default looks for a partial
@@ -251,12 +252,14 @@ def truncate_all_tables
   model_connections.each do |connection|
     if connection.adapter_name == "PostgreSQL"
       # use custom SQL to exclude tables from extensions
+      schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
          SELECT tablename
          FROM pg_tables
-         WHERE schemaname = ANY (current_schemas(false)) AND NOT tablename IN (
-           SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
-         )
+         WHERE schemaname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
+           AND NOT tablename IN (
+             SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
+           )
       SQL
       table_names.delete('schema_migrations')
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
@@ -350,6 +353,14 @@ module Helpers
     m.root_account_id = opts[:account_id] || Account.default.id
     m.save!
     m
+  end
+end
+
+if CANVAS_RAILS3
+  ActionController::TestSession.class_eval do
+    def destroy
+      clear
+    end
   end
 end
 
@@ -517,6 +528,24 @@ RSpec.configure do |config|
   def assert_require_login
     expect(response).to be_redirect
     expect(flash[:warning]).to eq "You must be logged in to access this page"
+  end
+
+  # Instead of directly comparing urls
+  # this will make sure urls match
+  # by parsing them, and comparing the results
+  # meaning these would match
+  #   http://test.dev/?foo=bar&other=1
+  #   http://test.dev/?other=1&foo=bar
+  def assert_url_parse_match(test_url, expected_url)
+    parsed_test = URI.parse(test_url)
+    parsed_expected = URI.parse(expected_url)
+
+    parsed_test_query = Rack::Utils.parse_nested_query(parsed_test.query)
+    parsed_expected_query = Rack::Utils.parse_nested_query(parsed_expected.query)
+
+    expect(parsed_test.scheme).to eq parsed_expected.scheme
+    expect(parsed_test.host).to eq parsed_expected.host
+    expect(parsed_test_query).to eq parsed_expected_query
   end
 
   def fixture_file_upload(path, mime_type=nil, binary=false)

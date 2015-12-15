@@ -70,8 +70,7 @@ class LoginController < ApplicationController
         active.
         find(params[:authentication_provider]).
         auth_type
-      # temporary back-compat if the Canvas AuthenticationProvider hasn't been created yet
-      auth_type ||= 'canvas' if params[:authentication_provider] == 'canvas'
+      params[:id] = params[:authentication_provider] if params[:authentication_provider] != auth_type
     else
       auth_type = @domain_root_account.authentication_providers.active.first.try(:auth_type)
       auth_type ||= 'canvas'

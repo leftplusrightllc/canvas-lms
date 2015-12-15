@@ -21,8 +21,9 @@ module CC::Exporter::Epub::Converters
       title, body, meta = get_html_title_and_body_and_meta_fields(doc)
       wiki[:title] = title
       wiki[:front_page] = meta['front_page'] == 'true'
-      wiki[:text] = body
-      wiki[:url_name] = wiki_name
+      wiki[:text] = convert_placeholder_paths_from_string!(body)
+      wiki[:identifier] = wiki_name
+      wiki[:href] = "wikis.xhtml##{wiki[:identifier]}"
       wiki
     end
 

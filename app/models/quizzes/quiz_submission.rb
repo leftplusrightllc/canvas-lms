@@ -198,6 +198,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
+  def results_visible_for_user?(user)
+    return true if user && self.quiz.grants_right?(user, :grade)
+    results_visible?
+  end
+
   def last_attempt_completed?
     completed? && quiz.allowed_attempts && attempt >= quiz.allowed_attempts
   end
@@ -637,18 +642,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
-  def update_if_needs_review(quiz=nil)
-    quiz = self.quiz if !quiz || quiz.id != self.quiz_id
-    return false unless self.completed?
-    return false if self.quiz_version && self.quiz_version >= quiz.version_number
-    if quiz.changed_significantly_since?(self.quiz_version)
-      self.workflow_state = 'pending_review'
-      self.save
-      return true
-    end
-    false
-  end
-
   def update_scores(params)
     params = (params || {}).with_indifferent_access
     self.manually_scored = false
@@ -819,6 +812,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   delegate :assignment_id, :assignment, :to => :quiz
   delegate :graded_at, :to => :submission
   delegate :context, :to => :quiz
+  delegate :excused?, to: :submission, allow_nil: true
 
   # Determine whether the QS can be retried (ie, re-generated).
   #

@@ -245,20 +245,24 @@ class EnrollmentsApiController < ApplicationController
     enrollments = enrollments.joins(:course) if has_courses
     enrollments = enrollments.shard(@shard_scope) if @shard_scope
     if params[:grading_period_id].present?
-      if !multiple_grading_periods?
-        render_create_errors([@@errors[:multiple_grading_periods_disabled]])
-        return false
-      end
-
       if @context.is_a? User
-        render(
-          json: {message: "grading_period_id can't be specified for users"},
-          status: 403
-        )
-        return false
+        unless @context.account.feature_enabled?(:multiple_grading_periods)
+          render_create_errors([@@errors[:multiple_grading_periods_disabled]])
+          return false
+        end
+
+        grading_period = @context.courses.lazy.map do |course|
+          GradingPeriod.context_find(course, params[:grading_period_id])
+        end.detect(&:present?)
+      else
+        unless multiple_grading_periods?
+          render_create_errors([@@errors[:multiple_grading_periods_disabled]])
+          return false
+        end
+
+        grading_period = GradingPeriod.context_find(@context, params[:grading_period_id])
       end
 
-      grading_period = GradingPeriod.context_find(@context, params[:grading_period_id])
       unless grading_period
         render(:json => {error: "invalid grading_period_id"}, :status => :bad_request)
         return
@@ -499,7 +503,7 @@ class EnrollmentsApiController < ApplicationController
     end
 
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
-      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
+      scope = @context.apply_enrollment_visibility(@context.all_enrollments, @current_user).where(enrollment_index_conditions)
       unless params[:state].present?
         scope = scope.active_or_pending
       end

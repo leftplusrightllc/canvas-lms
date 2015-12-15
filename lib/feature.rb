@@ -129,6 +129,15 @@ END
       root_opt_in: true,
       beta: true
     },
+    'epub_export' =>
+    {
+      display_name: -> { I18n.t('ePub Export') },
+      description: -> { I18n.t(<<END) },
+      This enables users to generate and download course ePub.
+END
+      applies_to: 'User',
+      state: 'hidden'
+    },
     'html5_first_videos' =>
     {
       display_name: -> { I18n.t('features.html5_first_videos', 'Prefer HTML5 for video playback') },
@@ -192,7 +201,7 @@ END
     },
     'k12' =>
     {
-      display_name: -> { I18n.t('features.k12', 'K-12 specific features') },
+      display_name: -> { I18n.t('features.k12', 'K-12 Specific Features') },
       description:  -> { I18n.t('k12_description', <<-END) },
 Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
 applies some style changes, but more K-12 specific things may be added in the future.
@@ -310,9 +319,17 @@ END
         state: 'hidden',
         beta: true
       },
+    'lti2_rereg' =>
+    {
+        display_name: -> {I18n.t('LTI 2 Reregistration')},
+        description: -> { I18n.t('Enable reregistration for LTI 2 ')},
+        applies_to:'RootAccount',
+        state: 'hidden',
+        beta: true
+    },
     'quizzes_lti' =>
       {
-        display_name: -> { I18n.t('Quiz LTI plugin') },
+        display_name: -> { I18n.t('Quiz LTI Plugin') },
         description: -> { I18n.t('Use the new quiz LTI tool in place of regular canvas quizzes') },
         applies_to: 'Course',
         state: 'hidden',
@@ -321,7 +338,7 @@ END
       },
     'disable_lti_post_only' =>
       {
-        display_name: -> { I18n.t('Don\'t move LTI query params to POST body') },
+        display_name: -> { I18n.t('Don\'t Move LTI Query Params to POST Body') },
         description: -> { I18n.t('If enabled, query parameters will not be copied to the POST body during an LTI launch.') },
         applies_to: 'RootAccount',
         state: 'hidden',
@@ -337,18 +354,9 @@ END
           root_opt_in: true,
           beta: true
       },
-    'nc_or' =>
-        {
-            display_name: -> { I18n.t('Enable "OR" Condition for Modules') },
-            description:  -> { I18n.t('If enabled, modules will have the option to be marked as complete when only one of the requirements is met.') },
-            applies_to: 'Course',
-            state: 'hidden_in_prod',
-            development: false,
-            root_opt_in: true
-        },
     'use_new_tree' =>
     {
-      display_name: -> { I18n.t('Use new folder tree in Files')},
+      display_name: -> { I18n.t('Use New Folder Tree in Files')},
       description: -> {I18n.t('Replaces the current folder tree with a new accessible and more feature rich folder tree.')},
       applies_to: 'Course',
       state: 'hidden',
@@ -368,7 +376,7 @@ END
       description: -> { I18n.t('Performance enhancements for the Gradebook') },
       applies_to: 'Course',
       state: 'hidden',
-      development: true,
+      hidden_in_production: true,
       root_opt_in: true
     },
     'anonymous_grading' =>
@@ -385,6 +393,21 @@ END
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
       applies_to: 'RootAccount',
       state: 'hidden',
+      root_opt_in: true
+    },
+    'international_sms_from_recipient_country' => {
+      display_name: -> { I18n.t("International SMS - Send from Recipient's Country") },
+      description: -> { I18n.t("Sends international text messages from a phone number in the recipient's country, if possible.") },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true
+    },
+    'all_grading_periods_totals' =>
+    {
+      display_name: -> { I18n.t('Display Totals for "All Grading Periods"') },
+      description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (Multiple Grading Periods must be enabled).') },
+      applies_to: 'Course',
+      state: 'allowed',
       root_opt_in: true
     }
   )

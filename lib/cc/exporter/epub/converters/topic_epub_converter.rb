@@ -9,7 +9,7 @@ module CC::Exporter::Epub::Converters
         cc_path = File.join @unzipped_file_path, res.at_css('file')['href']
 
         canvas_id = get_node_att(res, 'dependency', 'identifierref')
-        if canvas_id && meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]})
+        if canvas_id && (meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]}))
           canvas_path = File.join @unzipped_file_path, meta_res.at_css('file')['href']
           meta_node = open_file_xml(canvas_path)
         else
@@ -25,19 +25,21 @@ module CC::Exporter::Epub::Converters
 
     def convert_topic(cc_doc, meta_doc)
       topic = {}
-      topic['description'] = get_node_val(cc_doc, 'text')
-      topic['title'] = get_node_val(cc_doc, 'title')
+      topic[:description] = convert_placeholder_paths_from_string!(get_node_val(cc_doc, 'text'))
+      topic[:title] = get_node_val(cc_doc, 'title')
       if meta_doc
-        topic['title'] = get_node_val(meta_doc, 'title')
-        topic['type'] = get_node_val(meta_doc, 'type')
-        topic['discussion_type'] = get_node_val(meta_doc, 'discussion_type')
-        topic['pinned'] = get_bool_val(meta_doc, 'pinned')
-        topic['posted_at'] = get_time_val(meta_doc, 'posted_at')
-        topic['lock_at'] = get_time_val(meta_doc, 'lock_at')
-        topic['position'] = get_int_val(meta_doc, 'position')
+        topic[:title] = get_node_val(meta_doc, 'title')
+        topic[:type] = get_node_val(meta_doc, 'type')
+        topic[:discussion_type] = get_node_val(meta_doc, 'discussion_type')
+        topic[:pinned] = get_bool_val(meta_doc, 'pinned')
+        topic[:posted_at] = get_time_val(meta_doc, 'posted_at')
+        topic[:lock_at] = get_time_val(meta_doc, 'lock_at')
+        topic[:position] = get_int_val(meta_doc, 'position')
+        topic[:identifier] = get_node_val(meta_doc, 'topic_id')
+        topic[:href] = "topics.xhtml##{topic[:identifier]}"
 
         if asmnt_node = meta_doc.at_css('assignment')
-          topic['assignment'] = assignment_data(asmnt_node)
+          topic[:assignment] = assignment_data(asmnt_node)
         end
       end
 

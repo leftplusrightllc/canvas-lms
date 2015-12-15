@@ -1,23 +1,41 @@
 require_relative "../common"
 
-  def create_quiz_with_due_date(due_date=Time.zone.now)
-    unlock_at = Time.zone.now.advance(days:-2)
-    lock_at = Time.zone.now.advance(days:4)
-    @context = @course
+  def create_quiz_with_due_date(opts={})
+    @context = opts.fetch(:course, @course)
     @quiz = quiz_model
     @quiz.generate_quiz_data
-    @quiz.due_at = due_date
-    @quiz.lock_at = lock_at
-    @quiz.unlock_at = unlock_at
+    @quiz.due_at = opts.fetch(:due_at, default_time_for_due_date(Time.zone.now))
+    @quiz.lock_at = opts.fetch(:lock_at, default_time_for_lock_date(Time.zone.now.advance(days:4)))
+    @quiz.unlock_at = opts.fetch(:unlock_at, default_time_for_unlock_date(Time.zone.now.advance(days:-2)))
     @quiz.save!
     @quiz
   end
 
-  def create_multiple_choice_question
+  # The default time for a quiz due date is 11:59pm
+  def default_time_for_due_date(date)
+    date.change({ hour: 23, min: 59 })
+  end
+
+  # The default time for a quiz lock date is 11:59pm
+  def default_time_for_lock_date(date)
+    date.change({ hour: 23, min: 59 })
+  end
+
+  # The default time for a quiz unlock date is 12am
+  def default_time_for_unlock_date(date)
+    date.change({ hour: 0, min: 0 })
+  end
+
+  def assign_quiz_to_no_one
+    f('.ContainerDueDate .ic-token-delete-button').click
+  end
+
+  def create_multiple_choice_question(opts={})
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Choice')
 
-    type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
+    question_description = opts.fetch(:description, 'Hi, this is a multiple choice question.')
+    type_in_tiny ".question_form:visible textarea.question_content", question_description
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     expect(answers.length).to eq 4
@@ -230,7 +248,8 @@ require_relative "../common"
   #   answer will be chosen.
   def take_and_answer_quiz(submit=true)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { fln('Take the Quiz').click }
+
+    expect_new_page_load { f('#take_quiz_link').click }
 
     answer = if block_given?
       yield(@quiz.stored_questions[0][:answers])
@@ -244,7 +263,8 @@ require_relative "../common"
     end
 
     if submit
-      driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
+      expect_new_page_load { driver.execute_script("$('#submit_quiz_form .btn-primary').click()") }
+
       keep_trying_until do
         expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
       end
@@ -267,7 +287,7 @@ require_relative "../common"
     end
 
     if submit
-      expect_new_page_load { f('#submit_quiz_button').click }
+      expect_new_page_load(true) { f('#submit_quiz_button').click }
       keep_trying_until do
         expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
       end
@@ -316,6 +336,13 @@ require_relative "../common"
       wait_for_ajaximations
       f('.quiz-edit-button').click
     }
+  end
+
+  def cancel_quiz_edit
+    expect_new_page_load do
+      fj('#cancel_button', 'div#quiz_edit_actions').click
+      wait_for_ajaximations
+    end
   end
 
   def edit_first_multiple_choice_answer(text)

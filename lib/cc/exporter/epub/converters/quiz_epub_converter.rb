@@ -23,12 +23,15 @@ module CC::Exporter::Epub::Converters
       quiz_meta_data = open_file_xml(quiz_meta_link)
 
       quiz[:title] = get_node_val(quiz_meta_data, "title")
-      quiz[:description] = get_node_val(quiz_meta_data, "description")
+      quiz[:description] = convert_placeholder_paths_from_string!(get_node_val(quiz_meta_data, "description"))
       quiz[:due_at] = get_node_val(quiz_meta_data, "due_at")
       quiz[:lock_at] = get_node_val(quiz_meta_data, "lock_at")
       quiz[:unlock_at] = get_node_val(quiz_meta_data, "unlock_at")
       quiz[:allowed_attempts] = get_node_val(quiz_meta_data, "allowed_attempts")
       quiz[:points_possible] = get_node_val(quiz_meta_data, "points_possible")
+      quiz[:identifier] = get_node_att(quiz_meta_data, 'quiz', 'identifier')
+      quiz[:href] = "quizzes.xhtml##{quiz['identifier']}"
+      update_syllabus(quiz)
       quiz
     end
   end
