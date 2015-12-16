@@ -1,4 +1,40 @@
-// This is the default "brand_variables" file that is used for both "high_contrast"
-// as well as if there is not a config/brand_variables.scss file.
-// IT IS MEANT TO STAY BLANK.
-// That way, high_contrast users never see account-specific colors
+/*
+This is an expirimental feature to preview how branding canvas with your own colors will work.
+It's not ready yet, and should only be used on dev machines.
+
+To use, copy this file to `config/brand_variables.scss` (remove the `.example`).
+You can set values to whatever you want here and they will be used in the
+'new_styles_normal_contrast' and 'k12_normal_contrast' variants when they are compiled on
+your computer.
+remember, anything that you want to be able to set in this file, needs to have a "!default"
+next to it where it is declared in the real sass sheet.
+
+As we decide upon new variables that we want to be able to set, remember to add them to
+both "config/brand_variables.scss.example" as well as your "config/brand_variables.cass" locally.
+
+*/
+
+//// Canvas Primary Palette
+////////////////////////////////////////////////
+$ic-brand-primary: #147ecd;
+$ic-brand-secondary: #0b3a6d;
+$ic-link-color: #147ecd;
+
+//// Instructure Canvas (IC) Global Variables
+////////////////////////////////////////////////
+
+$ic-body-background-color: rgb(255, 255, 255);
+// $ic-content-background-color: ;
+$ic-font-color-light: #fff;
+$ic-font-color-dark: #1c1c1c;
+$ic-font-color--subdued: #a8a8a8;
+$ic-border-color: #d1d1d1;
+$ic-list-item-background--hover: #f9f9f9;
+$ic-list-item-background--selected: #e9e9e9;
+
+//// Buttons
+////////////////////////////
+$ic-brand-button--primary-bgd: #0b3a6d;
+$ic-brand-button--primary-text: #fff;
+$ic-brand-button--secondary-bgd: #d20026;
+$ic-brand-button--secondary-text: #fff;
