@@ -69,3 +69,10 @@ mkmf.log
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
+
+.ruby-version
+client_apps/canvas_quizzes/.yardoc/
+public/app/
+public/assets/
+public/custom/
+public/stylesheets_compiled/
