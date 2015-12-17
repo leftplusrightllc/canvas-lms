@@ -52,9 +52,11 @@
     <%# Begin default Canvas header %>
     <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
       <div id="header-inner">
-        <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
-        <!-- <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> -->
-        <b id="header-logo-secondary"></b>
+        <div class="header_wrapper">
+            <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
+            <a id="custom-header-logo" href="<%= dashboard_url %>"><%= image_tag('//dyx8la7fev297.cloudfront.net/assets/40th-anniversary-logo-en.png', class: 'logo-img') %></a>
+            <!--<b id="header-logo-secondary"></b>-->
+        </div>
         <%= render(:partial => "shared/user_header_navigation") %>
         <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
         <%= render(:partial => "shared/primary_header_navigation") %>

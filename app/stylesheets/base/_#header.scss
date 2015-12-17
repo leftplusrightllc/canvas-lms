@@ -51,7 +51,7 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #header-inner {
-  padding-top: 40px;
+  padding-top: 34px;
   //max-width: $max_main_width;
   max-width: 100% !important;
   position: relative;
@@ -196,7 +196,7 @@ $masquerade-link-color: $ic-color-alert;
   #menu {
     @include pie-clearfix;
     @include reset-list;
-    padding-top: 3px;
+    //padding-top: 3px;
     position: absolute;
     //margin-left: $left_side_width;
   }
@@ -442,3 +442,22 @@ $masquerade-link-color: $ic-color-alert;
 //body.no-headers{
 //  display: none !important;
 //}
+#custom-header-logo{
+  img{
+    max-height: 87px;
+  }
+}
+.wrapper_navigation
+{
+  background-image: url("//hsf.net/images/main-nav-bg.png");
+  background-color: #0b3a6d;
+  background-image: -moz-linear-gradient(top, #0a3665, #0c4078);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0a3665), to(#0c4078));
+  background-image: -webkit-linear-gradient(top, #0a3665, #0c4078);
+  background-image: -o-linear-gradient(top, #0a3665, #0c4078);
+  background-image: linear-gradient(to bottom, #0a3665, #0c4078);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0a3665', endColorstr='#ff0c4078', GradientType=0);
+  border-bottom: 3px solid #147ecd;
+  height: 37px;
+}

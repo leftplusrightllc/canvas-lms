@@ -1,26 +1,30 @@
-<% if @current_user %>
-  <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
-    <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
+<div class="wrapper_navigation">
+    <% if @current_user %>
+        <div class="header_wrapper">
+          <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
+            <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
 
-    <li id="courses_menu_item" class="menu-item">
-      <%= render(:partial => 'shared/home_menu') %>
-    </li>
-    <%- end -%>
-    <!--<li id="grades_menu_item" class="menu-item">-->
-      <!--<a href="<%= grades_path %>" class="menu-item-no-drop">-->
-        <!--<%= t('menu.grades', 'Grades') %>-->
-      <!--</a>-->
-    <!--</li>-->
-    <li id="all_courses_menu_item" class="menu-item">
-      <a href="<%= search_all_courses_path %>" class="menu-item-no-drop">
-        <%= t('menu.browse_courses', 'Browse Courses') %>
-      </a>
-    </li>
-    <li id="calendar_menu_item" class="menu-item">
-      <a href="<%= calendar_path %>" class="menu-item-no-drop">
-        <%= t('menu.calendar', 'Calendar') %>
-      </a>
-    </li>
-    <%= render(:partial => 'external_tools/global_nav_menu_items') %>
-  </ul>
-<% end %>
+            <li id="courses_menu_item" class="menu-item">
+              <%= render(:partial => 'shared/home_menu') %>
+            </li>
+            <%- end -%>
+            <!--<li id="grades_menu_item" class="menu-item">-->
+              <!--<a href="<%= grades_path %>" class="menu-item-no-drop">-->
+                <!--<%= t('menu.grades', 'Grades') %>-->
+              <!--</a>-->
+            <!--</li>-->
+            <li id="all_courses_menu_item" class="menu-item">
+              <a href="<%= search_all_courses_path %>" class="menu-item-no-drop">
+                <%= t('menu.browse_courses', 'Browse Courses') %>
+              </a>
+            </li>
+            <li id="calendar_menu_item" class="menu-item">
+              <a href="<%= calendar_path %>" class="menu-item-no-drop">
+                <%= t('menu.calendar', 'Calendar') %>
+              </a>
+            </li>
+            <%= render(:partial => 'external_tools/global_nav_menu_items') %>
+          </ul>
+        </div>
+    <% end %>
+</div>
