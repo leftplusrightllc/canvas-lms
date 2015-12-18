@@ -602,7 +602,7 @@ class Attachment < ActiveRecord::Base
         context.shard.activate do
           quota = Setting.get('context_default_quota', 50.megabytes.to_s).to_i
           quota = context.quota if (context.respond_to?("quota") && context.quota)
-
+          quota = Context_default_quota
           attachment_scope = context.attachments.active.where(root_attachment_id: nil)
 
           if context.is_a?(User)

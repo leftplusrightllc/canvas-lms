@@ -10,7 +10,7 @@ $modal_box_padding: 20px;
 
 body.modal {
   #footer {
-    display: block !important;
+    //display: block !important;
     @if $use_new_styles {
       @include breakpoint(desktop) {
         display: flex !important;

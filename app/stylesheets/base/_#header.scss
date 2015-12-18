@@ -51,12 +51,45 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #header-inner {
-  padding-top: 26px;
-  max-width: $max_main_width;
+  padding-top: 40px;
+  //max-width: $max_main_width;
+  max-width: 100% !important;
   position: relative;
+  min-height: 80px;
+  background-color: #fbfdff;
+  background-image: linear-gradient(#fff, #fff 70%, #e9f5fe);
+  background-position: 0 bottom;
+  background-repeat: no-repeat;
+  #header-logo2 img{
+    margin-top: -6px;
+    width: 260px;
+  }
+  .header_menus{
+    background-color: #0b3a6d;
+    background-image: linear-gradient(to bottom, #0a3665, #0c4078);
+    background-repeat: repeat-x;
+    border-bottom: 3px solid #147ecd;
+    height: 37px;
+  }
 }
 
 #header {
+  #topbar{
+    background-color: #1077c4;
+    background-image: linear-gradient(to bottom, #147ecd, #0b6cb6);
+    background-repeat: repeat-x;
+    height: 29px;
+    a{
+      color: #9dcbef;
+      &:hover{
+        color: #f5fafd;
+      }
+    }
+  }
+
+  #identity{
+    background: none;
+  }
   @if $use_new_styles == false {
     position: relative;
     z-index: 11;
@@ -156,7 +189,8 @@ $masquerade-link-color: $ic-color-alert;
     @include pie-clearfix;
     @include reset-list;
     padding-top: 3px;
-    margin-left: $left_side_width;
+    //margin-left: $left_side_width;
+    position: absolute;
   }
 }
 
@@ -396,4 +430,38 @@ $masquerade-link-color: $ic-color-alert;
 .customListGhost {
   position: absolute;
   z-index: 100;
+}
+#custom-header-logo{
+  img{
+    max-height: 87px;
+  }
+}
+.wrapper_navigation
+{
+  background-image: url("//hsf.net/images/main-nav-bg.png");
+  background-color: #0b3a6d;
+  background-image: -moz-linear-gradient(top, #0a3665, #0c4078);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0a3665), to(#0c4078));
+  background-image: -webkit-linear-gradient(top, #0a3665, #0c4078);
+  background-image: -o-linear-gradient(top, #0a3665, #0c4078);
+  background-image: linear-gradient(to bottom, #0a3665, #0c4078);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0a3665', endColorstr='#ff0c4078', GradientType=0);
+  border-bottom: 3px solid #147ecd;
+  height: 37px;
+}
+
+#footer {
+  background: #104074 none repeat scroll 0 0;
+  margin-left: 0 !important;
+  padding: 40px 0;
+  margin-right: 0!important;
+}
+body.modal #footer{
+  //display: none !important;
+}
+.header_wrapper{
+  margin: 0 auto;
+  max-width: 1000px;
+  position: relative;
 }
