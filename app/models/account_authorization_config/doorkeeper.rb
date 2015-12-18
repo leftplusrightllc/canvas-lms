@@ -85,8 +85,9 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
     http = Net::HTTP.new(HostUrl.default_host.split(":").first, HostUrl.default_host.split(":").last) if HostUrl.default_host.include?(":")
     http = Net::HTTP.new(HostUrl.default_host) unless HostUrl.default_host.include?(":")
 
+    http.use_ssl = true if HostUrl.protocol == 'https'
+    http.use_ssl = false if HostUrl.protocol == 'http'
     http.read_timeout = 500
-    http.use_ssl = false
 
     data = {
         user: {

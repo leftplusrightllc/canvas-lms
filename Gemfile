@@ -17,3 +17,5 @@ require File.expand_path("../config/canvas_rails4", __FILE__)
 Dir.glob(File.join(File.dirname(__FILE__), 'Gemfile.d', '*.rb')).sort.each do |file|
   eval_gemfile(file)
 end
+
+gem "puma"
