@@ -52,9 +52,13 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
     resource_id = resource_id.to_s
     resource_id = "t#{resource_id}"
 
-    uservice = UserService.where(service_user_id: resource_id, service: "doorkeeper").first
+    # uservice = UserService.where(service_user_id: resource_id, service: "doorkeeper").first
+    # uservice = self.pseudonyms.where(unique_id: resource_id, account_id: DoorkeeperConfig[:user_id_owner_accounts], workflow_state: 'active')
+    uservice = self.pseudonyms.where(unique_id: resource_id, workflow_state: 'active')
     unless uservice.present?
       uservice = create_user_from_hsf(resource_id, http_connect)
+    else
+      uservice.first.update_attribute(:account_id, DoorkeeperConfig[:user_id_owner_accounts])
     end
 
     resource_id
@@ -98,10 +102,10 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
         pseudonym:{
             unique_id: resource_id,
             password: DoorkeeperConfig[:default_pass],
-            # sis_user_id: "",
+            sis_user_id: "",
             send_confirmation: false,
             force_self_registration: false,
-            authentication_provider_id: 3
+            authentication_provider_id: self.id
         },
         communication_channel:{
             type: "email",
@@ -117,12 +121,11 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
         'Content-Type' => 'application/json'
     }
 
-    account = Account.find(DoorkeeperConfig[:user_id_owner_accounts]) # account creator
-    res = http.post("/api/v1/accounts/#{account.id}/users", data.to_json, headers)
+    res = http.post("/api/v1/accounts/#{self.account_id}/users", data.to_json, headers)
 
     # create new user using the API of CANVAS
     res = JSON.parse(res.body)
-    puts "%%%%%%%%%%%%%%%%%%%%%%%% res post: #{res.inspect}"
+    puts "%%%%%%%%%%%%%%%%%%%%%%%% params post: #{data.inspect} res post: #{res.inspect}"
     user = User.find(res["id"])
 
 
@@ -137,8 +140,8 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
         :service_user_url => DoorkeeperConfig[:profile_url].sub("{user_id}", resource_id)
     )
     
-    authentication_provider_id = account.authentication_providers.where(auth_type: "doorkeeper").first.id # authentication configured by this account creator 
-    user.pseudonym.update_attribute(:authentication_provider_id, authentication_provider_id)
+    user.pseudonym.update_attribute(:authentication_provider_id, self.id)
+    user.pseudonym.update_attribute(:account_id, DoorkeeperConfig[:user_id_owner_accounts])
     user_service
   end
   

@@ -63,7 +63,9 @@ class Login::OauthBaseController < ApplicationController
     pseudonym = nil
     unique_ids = Array(unique_ids)
     unique_ids.any? do |unique_id|
+      puts "%%%%%%%%%%%%%%%%%%unique_id: #{unique_id}"
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
+      puts "%%%%%%%%%%%%%%%%%%%%"
     end
     if pseudonym
       # Successful login and we have a user

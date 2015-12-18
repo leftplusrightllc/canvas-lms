@@ -158,6 +158,7 @@ class Pseudonym < ActiveRecord::Base
 
   def self.for_auth_configuration(unique_id, aac)
     auth_id = aac.try(:auth_provider_filter)
+    puts "@@@@@@@@@@@@@@@ query: #{active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).to_sql}"
     active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).first
   end
 
