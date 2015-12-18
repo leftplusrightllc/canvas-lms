@@ -19,7 +19,7 @@
 class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth2
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :doorkeeper
-  plugin_settings :client_id, client_secret: :client_secret_dec
+  plugin_settings :client_id, :setting_domain_oauth, :setting_logout_url, :setting_oauth_site, :setting_token_url, :setting_authorize_url, :setting_profile_url, :setting_canvas_token, :setting_user_id_owner_accounts, :setting_default_pass, client_secret: :client_secret_dec
 
   def self.sti_name
     'doorkeeper'.freeze
@@ -43,22 +43,22 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
   end
 
   def user_logout_redirect(controller, current_u)
-    DoorkeeperConfig[:logout_url].sub('{canvas_login_url}', URI.escape(controller.login_url))
+    setting_logout_url.sub('{canvas_login_url}', URI.escape(controller.login_url))
   end
 
   def unique_id(http_connect)
+    puts "@@@@@@@@@@@@@@@@@@@ #{client_id.inspect}=======user_id_owner_accounts: #{setting_user_id_owner_accounts.inspect}"
     res = http_connect.get("/oauth/token/info", {"Authorization"=> http_connect.options[:header_format].sub("%s", http_connect.token)})
     resource_id = JSON.parse(res.response.body)["resource_owner_id"].to_s
     resource_id = resource_id.to_s
     resource_id = "t#{resource_id}"
 
     # uservice = UserService.where(service_user_id: resource_id, service: "doorkeeper").first
-    # uservice = self.pseudonyms.where(unique_id: resource_id, account_id: DoorkeeperConfig[:user_id_owner_accounts], workflow_state: 'active')
     uservice = self.pseudonyms.where(unique_id: resource_id, workflow_state: 'active')
     unless uservice.present?
       uservice = create_user_from_hsf(resource_id, http_connect)
     else
-      uservice.first.update_attribute(:account_id, DoorkeeperConfig[:user_id_owner_accounts])
+      uservice.first.update_attribute(:account_id, setting_user_id_owner_accounts)
     end
 
     resource_id
@@ -101,7 +101,7 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
         },
         pseudonym:{
             unique_id: resource_id,
-            password: DoorkeeperConfig[:default_pass],
+            password: setting_default_pass,
             sis_user_id: "",
             send_confirmation: false,
             force_self_registration: false,
@@ -117,7 +117,7 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
         enable_sis_reactivation: false
     }
     headers = {
-        'Authorization' => "Bearer #{DoorkeeperConfig[:canvas_token]}", # token generated in canvas lms
+        'Authorization' => "Bearer #{setting_canvas_token}", # token generated in canvas lms
         'Content-Type' => 'application/json'
     }
 
@@ -134,22 +134,22 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
         :service => "doorkeeper",
         :token => http_connect.token,
         :user => user,
-        :service_domain => DoorkeeperConfig[:domain],
+        :service_domain => setting_domain_oauth,
         :service_user_id => resource_id,
         :service_user_name => data[:pseudonym][:unique_id],
-        :service_user_url => DoorkeeperConfig[:profile_url].sub("{user_id}", resource_id)
+        :service_user_url => setting_profile_url.sub("{user_id}", resource_id)
     )
     
     user.pseudonym.update_attribute(:authentication_provider_id, self.id)
-    user.pseudonym.update_attribute(:account_id, DoorkeeperConfig[:user_id_owner_accounts])
+    user.pseudonym.update_attribute(:account_id, setting_user_id_owner_accounts)
     user_service
   end
   
   def client_options
     {
-      site: DoorkeeperConfig[:site],
-      authorize_url: DoorkeeperConfig[:authorize_url],
-      token_url: DoorkeeperConfig[:token_url]
+      site: setting_oauth_site,
+      authorize_url: setting_authorize_url,
+      token_url: setting_token_url
     }
   end
 

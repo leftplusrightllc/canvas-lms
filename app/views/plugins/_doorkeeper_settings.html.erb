@@ -1,7 +1,7 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
-  <table style="width: 500px;" class="formtable">
+  <table class="formtable">
     <tr>
-      <td colspan="2"><%= mt(<<-TEXT, :doorkeeper_url => DoorkeeperConfig[:my_oauth_applications_url], :callback_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/login/oauth2/callback</span>'))
+      <td colspan="2"><%= mt(<<-TEXT, :doorkeeper_url => 'http://dashboard.hsfdev.com/en/oauth/applications', :callback_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/login/oauth2/callback</span>'))
 You will need to [register an application on Doorkeeper](%{doorkeeper_url}).
 You should add %{callback_url} as an OAuth 2.0 authorized redirect URL, and set the Application Status to Live
 After you create your application, make a note of the Client ID and Client Secret, and enter them here.
@@ -20,5 +20,86 @@ TEXT
         <%= f.password_field :client_secret %>
       </td>
     </tr>
+
+      <tr>
+          <td><%= f.blabel :setting_user_id_owner_accounts, :en => "User ID Owner of oauth accounts" %></td>
+          <td>
+              <%= f.text_field :setting_user_id_owner_accounts %>
+              <small>(default 1)</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_default_pass, :en => "Default Password" %>
+          </td>
+          <td>
+              <%= f.text_field :setting_default_pass %>
+              <small>Default password for new users</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_canvas_token, :en => "Canvas Lms Access Token" %>
+
+          </td>
+          <td>
+              <%= f.text_field :setting_canvas_token %>
+              <small>Token for Internal API (Generate access token in your settings and paste here.)</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_profile_url, :en => "Profile Url ofr oauth users" %>
+          </td>
+          <td>
+              <%= f.text_field :setting_profile_url %>
+              <small>Sample: http://my.hsfdev.com/users/{user_id}/profile/</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_token_url, :en => "Hsf Server from where to get token" %>
+          </td>
+          <td>
+              <%= f.text_field :setting_token_url %>
+              <small>Sample: http://my.hsfdev.com/oauth/token</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_authorize_url, :en => "Oauth authorization url" %>
+          </td>
+          <td>
+              <%= f.text_field :setting_authorize_url %>
+              <small>Sample: http://my.hsfdev.com/oauth/authorize</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_oauth_site, :en => "Oauth Site URL" %>
+          </td>
+          <td>
+              <%= f.text_field :setting_oauth_site %>
+              <small>Sample: http://my.hsfdev.com</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_logout_url, :en => "Url to redirect after logout" %>
+          </td>
+          <td>
+              <%= f.text_field :setting_logout_url %>
+              <small>Sample: http://my.hsfdev.com/en/users/sign_out?redirect_url={canvas_login_url}</small>
+          </td>
+      </tr>
+      <tr>
+          <td>
+              <%= f.blabel :setting_domain_oauth, :en => "Domain of oauth site" %>
+          </td>
+          <td>
+              <%= f.text_field :setting_domain_oauth %>
+              <small>Sample: my.hsfdev.com</small>
+          </td>
+      </tr>
   </table>
 <% end %>
