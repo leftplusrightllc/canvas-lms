@@ -89,6 +89,7 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
     http.use_ssl = false if HostUrl.protocol == 'http'
     http.read_timeout = 500
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    http.ssl_version = :SSLv3
 
     data = {
         user: {
