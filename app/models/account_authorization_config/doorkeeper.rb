@@ -47,13 +47,11 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
   end
 
   def unique_id(http_connect)
-    puts "@@@@@@@@@@@@@@@@@@@ #{client_id.inspect}=======user_id_owner_accounts: #{setting_user_id_owner_accounts.inspect}"
     res = http_connect.get("/oauth/token/info", {"Authorization"=> http_connect.options[:header_format].sub("%s", http_connect.token)})
     resource_id = JSON.parse(res.response.body)["resource_owner_id"].to_s
     resource_id = resource_id.to_s
-    resource_id = "hsf#{resource_id}"
+    resource_id = "hsf_prod#{resource_id}"
 
-    # uservice = UserService.where(service_user_id: resource_id, service: "doorkeeper").first
     uservice = self.pseudonyms.where(unique_id: resource_id, workflow_state: 'active')
     unless uservice.present?
       uservice = create_user_from_hsf(resource_id, http_connect)
@@ -280,11 +278,7 @@ class AccountAuthorizationConfig::Doorkeeper < AccountAuthorizationConfig::Oauth
       params[:pseudonym].delete(:password)
       params[:pseudonym].delete(:password_confirmation)
     end
-    if params[:pseudonym][:authentication_provider_id]
-      @pseudonym.authentication_provider = @context.
-          authentication_providers.active.
-          find(params[:pseudonym][:authentication_provider_id])
-    end
+    @pseudonym.authentication_provider = self if params[:pseudonym][:authentication_provider_id]
     @pseudonym.attributes = params[:pseudonym]
     @pseudonym.sis_user_id = sis_user_id
 
