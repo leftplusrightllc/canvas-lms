@@ -123,6 +123,7 @@ body {
 #main {
   position: relative;
   z-index: 10;
+  margin: 0 auto;
 
   @if $use_new_styles == false {
     background-color: $body-bg-color;
@@ -212,7 +213,7 @@ body {
   @if $use_new_styles == false {
     color: #5c5c5c;
     font-size: 11px;
-    margin: 0 15px 34px;
+//    margin: 0 15px 34px;
   }
 
   .footer-logo {
