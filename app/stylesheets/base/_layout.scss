@@ -124,14 +124,13 @@ body {
   position: relative;
   z-index: 10;
   margin: 0 auto;
-
   @if $use_new_styles == false {
     background-color: $body-bg-color;
     border: none;
     margin-bottom: 40px;
     @include pie-clearfix;
     min-height: 450px;
-    max-width: $max_main_width;
+    //max-width: $max_main_width;
   }
 }
 
@@ -248,4 +247,10 @@ div.content_notice {
   i {
     padding-right: 8px;
   }
+}
+
+.content_wrapper{
+  margin: 0 auto;
+  max-width: 90%;
+  position: relative;
 }

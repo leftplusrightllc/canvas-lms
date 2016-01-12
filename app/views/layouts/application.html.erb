@@ -55,9 +55,9 @@
         <!--<a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>-->
         <!--<a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>-->
         <!--<b id="header-logo-secondary"></b>-->
-        <div class="header_wrapper">
+        <div class="content_wrapper">
               <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
-              <a id="custom-header-logo" href="<%= dashboard_url %>"><%= image_tag('//dyx8la7fev297.cloudfront.net/assets/40th-anniversary-logo-en.png', class: 'logo-img') %></a>
+              <a id="custom-header-logo" href="<%= dashboard_url %>"><%= image_tag('/hsf-logo.png', class: 'logo-img') %></a>
               <!--<b id="header-logo-secondary"></b>-->
         </div>
         <%= render(:partial => "shared/user_header_navigation") %>
@@ -75,7 +75,7 @@
 
   <%= yield :leading_content %>
 
-  <div id="wrapper-container" <% if use_new_styles? %>class="ic-app-container"<% end %>>
+  <div id="wrapper-container" class="content_wrapper" <% if use_new_styles? %>class="ic-app-container"<% end %>>
     <div id="wrapper" <% if use_new_styles? %>class="ic-app-main-layout-vertical"<% end %>>
       <% #Start new styles div %>
       <% if crumbs.length > 1 && use_new_styles? %>
@@ -140,9 +140,9 @@
         </div>
       <% #End new styles div %>
       <% if use_new_styles? %></div><% end %>
-      <%= render :partial => 'shared/canvas_footer' %>
     </div>
   </div>
+  <%= render :partial => 'shared/canvas_footer' %>
 
   <% if @show_embedded_chat %>
     <%= render :partial => 'shared/embedded_chat' %>

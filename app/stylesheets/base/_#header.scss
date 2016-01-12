@@ -51,7 +51,7 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #header-inner {
-  padding-top: 40px;
+  padding-top: 30px;
   //max-width: $max_main_width;
   max-width: 100% !important;
   position: relative;
@@ -85,6 +85,50 @@ $masquerade-link-color: $ic-color-alert;
         color: #f5fafd;
       }
     }
+    .hsf-menus{
+      list-style: none;
+      margin: 4px 0 0;
+      padding: 0;
+      float: left;
+      a{
+        color: #fff;
+      }
+      .caret{
+        border-top-color: #fff;
+      }
+      > li{
+        float: left;
+        padding: 4px 10px;
+        border-radius: 3px;
+        &:hover{
+          background-color: rgba(255, 255, 255, 0.5);
+        }
+        &.active{
+          background: #fff;
+          a{ color: #104074; }
+        }
+      }
+      li.dropdown:hover{
+        background: #fff;
+        > a{ color: #104074; }
+        .caret{ border-top-color: #104074; }
+        > ul{
+          //border-top: medium none;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+          border: none;
+          display: block;
+          margin-top: -3px;
+          a{
+            color: #878787;
+            &:hover{
+              color: #147ecd;
+              background: none;
+            }
+          }
+        }
+      }
+    }
   }
 
   #identity{
@@ -113,7 +157,7 @@ $masquerade-link-color: $ic-color-alert;
   top: 0;
   right: 0;
   width: 100%;
-  overflow: hidden;
+  //overflow: hidden;
 }
 
 #identity {
@@ -122,7 +166,7 @@ $masquerade-link-color: $ic-color-alert;
 
   float: right;
   font-size: 12px;
-  margin-right: $right_side_margin;
+  margin-right: 0;
   // make room for the drop shadow
   margin-bottom: 4px;
   padding: 0 11px;
@@ -135,7 +179,7 @@ $masquerade-link-color: $ic-color-alert;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   border-top: 0;
-
+  padding-right: 0;
   li {
       color: white;
       float: left;
@@ -145,6 +189,9 @@ $masquerade-link-color: $ic-color-alert;
 
     &.first, &#identity-help-container {
       border-left: none;
+    }
+    &:last-child{
+      margin-right: 0;
     }
     form {
       margin: 0;
@@ -432,8 +479,11 @@ $masquerade-link-color: $ic-color-alert;
   z-index: 100;
 }
 #custom-header-logo{
+  display: inline-block;
+  margin-bottom: 3px;
+  margin-top: 3px;
   img{
-    max-height: 87px;
+    max-height: 91px;
   }
 }
 .wrapper_navigation
@@ -461,9 +511,4 @@ $masquerade-link-color: $ic-color-alert;
 }
 body.modal #footer{
   //display: none !important;
-}
-.header_wrapper{
-  margin: 0 auto;
-  max-width: 1000px;
-  position: relative;
 }
