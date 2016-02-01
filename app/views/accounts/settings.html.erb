@@ -628,7 +628,7 @@ acknowledge that you have read and agreed to the
                 <%= settings.text_field :custom_logo_url, value: custom_config["custom_logo_url"] %>
               </div>
               <div>
-                <%= settings.label :custom_wellcome_title, "Welcom Title" %><br>
+                <%= settings.label :custom_wellcome_title, "Welcome Title" %><br>
                 <%= settings.text_field :custom_wellcome_title, value: custom_config["custom_wellcome_title"] %>
               </div>
               <div>
@@ -638,6 +638,15 @@ acknowledge that you have read and agreed to the
               <div>
                 <%= settings.label :custom_course_default_activity_msg, "Course Activity Default Message" %><br>
                 <%= settings.text_area :custom_course_default_activity_msg, cols: 'auto', rows: '6', style: 'width: 60%;', value: custom_config["custom_course_default_activity_msg"] %>
+              </div>
+              <div>
+                <%= settings.label :custom_course_enrollment_subject, "Course Enrollment Email Subject" %><br>
+                <%= settings.text_field :custom_course_enrollment_subject, value: custom_config["custom_course_enrollment_subject"] || 'Welcome to course' %>
+              </div>
+              <div>
+                <%= settings.label :custom_course_enrollment_message, "Course Enrollment Email Boby" %><br>
+                <%= settings.text_area :custom_course_enrollment_message, cols: 'auto', rows: '6', style: 'width: 60%;', value: custom_config["custom_course_enrollment_message"] || "Welcome to course {course_name}" %>
+                <small>Use {course_name} to reffer the course name.</small>
               </div>
             <% end %>
           </fieldset>

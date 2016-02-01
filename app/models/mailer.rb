@@ -42,6 +42,23 @@ class Mailer < ActionMailer::Base
     end
   end
 
+  # define in rails3-style
+  def create_message_custom(m)
+    params = {
+      from: m[:from],
+      to: m[:to],
+      subject: m[:subject]
+    }
+
+    reply_to = m[:reply_to]
+    params[:reply_to] = reply_to if reply_to
+
+    mail(params) do |format|
+      format.text{ render text: m[:body] }
+      format.html{ render text: m[:html_body] } if m[:html_body].present?
+    end
+  end
+
   private
   def quoted_address(display_name, address)
     addr = Mail::Address.new(address)

@@ -455,6 +455,12 @@ class EnrollmentsApiController < ApplicationController
     @current_user.require_self_enrollment_code = true
     @current_user.self_enrollment_code = code
     if @current_user.save
+      m = {}
+      m[:to] = @current_user.email
+      m[:subject] = hsf_custom_config["custom_course_enrollment_subject"] || "Welcome to course"
+      m[:html_body] = hsf_custom_config["custom_course_enrollment_message"].to_s.sub("{course_name}", @context.full_name)
+      m[:html_body] = "Welcome to course #{@context.full_name}" unless m[:html_body].present?
+      Mailer.create_message_custom(m).deliver rescue nil # omg! just ignore delivery failures
       render(json: enrollment_json(@current_user.self_enrollment, @current_user, session))
     else
       render(json: {user: @current_user.errors}, status: :bad_request)
