@@ -598,6 +598,7 @@ acknowledge that you have read and agreed to the
         <% end %>
 
         <% if @account.root_account? && !@account.site_admin? %>
+        
           <fieldset>
             <legend><%= t(:create_courses_title, "Who Can Create New Courses") %></legend>
             <div style="font-size: 0.8em;"><%= t(:create_courses_description, "(Account Administrators can always create courses)") %></div>
@@ -619,7 +620,7 @@ acknowledge that you have read and agreed to the
         <% end %>
 
         <% if @account.root_account? && !@account.site_admin? %>
-        <% custom_config = hsf_custom_config %>
+          <% custom_config = hsf_custom_config %>
           <fieldset>
             <legend><%= t(:custom_data, "HSF Custom Information") %></legend>
             <%= f.fields_for :hsf_settings do |settings| %>
@@ -645,7 +646,7 @@ acknowledge that you have read and agreed to the
               </div>
               <div>
                 <%= settings.label :custom_course_enrollment_message, "Course Enrollment Email Boby" %><br>
-                <%= settings.text_area :custom_course_enrollment_message, cols: 'auto', rows: '6', style: 'width: 60%;', value: custom_config["custom_course_enrollment_message"] || "Welcome to course {course_name}" %>
+                <%= settings.text_area :custom_course_enrollment_message, cols: 'auto', rows: '6', style: 'width: 60%;', value: custom_config["custom_course_enrollment_message"] || "Welcome to course {course_name}" %><br>
                 <small>Use {course_name} to reffer the course name.</small>
               </div>
             <% end %>
