@@ -12,13 +12,17 @@
         <%= t('no_recent_messages', 'No Recent Messages') %>
       </div>
       <span class="notification_message">
-      <%= t 'empty_stream_message', <<-BODY
-      You don't have any messages to show in your stream yet.  Once you
-      begin participating in your courses you'll see this stream fill up
-      with messages from discussions, grading updates, private messages between
-      you and other users, etc.
-      BODY
-      %>
+      <% if hsf_custom_config["custom_course_default_activity_msg"].present? %>
+        <%= hsf_custom_config["custom_course_default_activity_msg"] %>
+      <% else %>
+        <%=  t 'empty_stream_message', <<-BODY
+        You don't have any messages to show in your stream yet.  Once you
+        begin participating in your courses you'll see this stream fill up
+        with messages from discussions, grading updates, private messages between
+        you and other users, etc.
+        BODY
+        %>
+      <% end %>
       </span>
     </div>
   </div>

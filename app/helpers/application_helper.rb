@@ -23,6 +23,22 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
 
+  # return hsf custom configurations
+  def hsf_custom_config(settings = nil)
+    config = Setting.where(name: 'hsf_custom_config').first
+    unless config.present?
+      vv = {custom_logo_url: 'WElcome to HSF', custom_wellcome_msg: "You don't have any courses, so this page won't be very exciting for now.
+        Once you've created or signed up for courses, you'll start to see
+        conversations from all of your classes.", custom_course_default_activity_msg: "You don't have any messages to show in your stream yet.  Once you
+        begin participating in your courses you'll see this stream fill up
+        with messages."}.to_json
+      Setting.create!(name: 'hsf_custom_config', value: vv)
+      config = Setting.where(name: 'hsf_custom_config').first
+    end
+    config.update_attributes(value: settings.to_json) if settings.present?
+    JSON.parse(config.value)
+  end
+
   def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)

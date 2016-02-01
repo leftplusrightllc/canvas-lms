@@ -518,6 +518,8 @@ class AccountsController < ApplicationController
           @account[:settings][:edit_institution_email] = value_to_boolean(can_edit_email)
         end
 
+        hsf_custom_config(params[:account][:hsf_settings])
+
         if @account.update_attributes(params[:account])
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account }

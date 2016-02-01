@@ -618,6 +618,31 @@ acknowledge that you have read and agreed to the
           </fieldset>
         <% end %>
 
+        <% if @account.root_account? && !@account.site_admin? %>
+        <% custom_config = hsf_custom_config %>
+          <fieldset>
+            <legend><%= t(:custom_data, "HSF Custom Information") %></legend>
+            <%= f.fields_for :hsf_settings do |settings| %>
+              <div style='display: none;'>
+                <%= settings.label :custom_logo_url, "HSF Logo URI" %><br>
+                <%= settings.text_field :custom_logo_url, value: custom_config["custom_logo_url"] %>
+              </div>
+              <div>
+                <%= settings.label :custom_wellcome_title, "Welcom Title" %><br>
+                <%= settings.text_field :custom_wellcome_title, value: custom_config["custom_wellcome_title"] %>
+              </div>
+              <div>
+                <%= settings.label :custom_wellcome_msg, "Dashbard Welcome Message" %><br>
+                <%= settings.text_area :custom_wellcome_msg, cols: 'auto', rows: '6', style: 'width: 60%;', value: custom_config["custom_wellcome_msg"] %>                
+              </div>
+              <div>
+                <%= settings.label :custom_course_default_activity_msg, "Course Activity Default Message" %><br>
+                <%= settings.text_area :custom_course_default_activity_msg, cols: 'auto', rows: '6', style: 'width: 60%;', value: custom_config["custom_course_default_activity_msg"] %>
+              </div>
+            <% end %>
+          </fieldset>
+        <% end %>
+
         <%= render partial: 'external_integration_keys', locals: { f: f } %>
 
         <div class="button-container">

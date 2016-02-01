@@ -35,6 +35,7 @@ module DashboardHelper
         more courses or set up your profile.
       BODY
     else
+      hsf_custom_config["custom_wellcome_msg"] || 
       t('#users.welcome.no_courses_message', <<-BODY)
         You don't have any courses, so this page won't be very exciting for now.
         Once you've created or signed up for courses, you'll start to see
