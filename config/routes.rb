@@ -502,6 +502,7 @@ CanvasRails::Application.routes.draw do
     get :admin_tools
     post 'account_users' => 'accounts#add_account_user', as: :add_account_user
     delete 'account_users/:id' => 'accounts#remove_account_user', as: :remove_account_user
+
     resources :grading_standards, only: [:index, :create, :update, :destroy]
     get :statistics
     get 'statistics/over_time/:attribute' => 'accounts#statistics_graph', as: :statistics_graph
@@ -540,7 +541,10 @@ CanvasRails::Application.routes.draw do
     delete 'users/:user_id' => 'accounts#remove_user', as: :delete_user
 
     # create/delete are handled by specific routes just above
-    resources :users, only: [:index, :new, :edit, :show, :update]
+    resources :users, only: [:index, :new, :edit, :show, :update] do
+      get :resend_account_creation
+      get :forgot_pass
+    end
     resources :account_notifications, only: [:create, :destroy]
     concerns :announcements
     resources :assignments

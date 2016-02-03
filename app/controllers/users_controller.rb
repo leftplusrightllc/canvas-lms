@@ -188,6 +188,49 @@ class UsersController < ApplicationController
     end
   end
 
+  # resend the email of account creation
+  def resend_account_creation
+    user = User.where(id: params[:user_id]).first
+    p = user.pseudonym
+    p.send_confirmation! rescue nil
+    flash[:notice] = t("resend_account_creation", default: "Email resent to #{user.email}")
+    redirect_to :back
+  end
+
+  # forgot password for specific user
+  def forgot_pass
+    user = User.where(id: params[:user_id]).first
+    email = user.email
+    @ccs = []
+    if email.present?
+      @ccs = CommunicationChannel.email.by_path(email).active.to_a
+      if @ccs.empty?
+        @ccs += CommunicationChannel.email.by_path(email).to_a
+      end
+      if @domain_root_account
+        @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
+          cc = p.communication_channel if p.communication_channel && p.user
+          cc ||= p.user.communication_channel rescue nil
+          @ccs << cc
+        end
+      end
+    end
+    @ccs = @ccs.flatten.compact.uniq.select do |cc|
+      if !cc.user
+        false
+      else
+        cc.pseudonym ||= cc.user.pseudonym rescue nil
+        cc.save if cc.changed?
+        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (p.works_for_account?(@domain_root_account) && p.account && p.account.canvas_authentication?) }
+      end
+    end
+    flash[:notice] = t 'notices.email_sent', "Confirmation email sent to %{email}, make sure to check your spam box", :email => email
+    @ccs.each do |cc|
+      cc.forgot_password! rescue nil
+    end
+    redirect_to :back
+  end
+
   def grades_for_student
     enrollment = Enrollment.active.find(params[:enrollment_id])
     return render_unauthorized_action unless enrollment.grants_right?(@current_user, session, :read_grades)

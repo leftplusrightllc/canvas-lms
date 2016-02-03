@@ -44,13 +44,21 @@
 
 <%= will_paginate(@users, :style=>"margin-bottom: 1em;") %>
 
-<ul class="users">
+<table class="users table table-hover">
   <% @users.each do |user| %>
-    <%= content_tag_for(:li, user) do %>
-      <%= link_to(user.last_name_first_or_unnamed, context_url(@context, :context_user_url, user)) %>
-    <% end %>
+    <tr>
+      <td>
+        <%= link_to(user.last_name_first_or_unnamed, context_url(@context, :context_user_url, user)) %>
+      </td>
+      <td>
+        <div class="text-right">
+          <%= link_to(t("resend_welcome_email", default: "Resend Welcome Email"), context_url(@context, :account_user_resend_account_creation_url, user), confirm: 'Are you sure?') %> | 
+          <%= link_to(t("forgot_pass", default: "Forgot Password"), context_url(@context, :account_user_forgot_pass_url, user), confirm: 'Are you sure?') %>
+        </div>
+      </td>
+    </tr>
   <% end %>
-</ul>
+</table>
 
 <%= will_paginate(@users, :style=>"margin-top: 1em;") %>
 
