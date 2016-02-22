@@ -1643,7 +1643,7 @@ class ApplicationController < ActionController::Base
         .gsub('{{course_sections}}',  course.course_sections.pluck(:name).join(', '))
         .gsub('{{coming_up}}',  course.calendar_events.where('calendar_events.start_at > ?', Time.current).map{|c| "#{c.title} (#{c.start_at}, #{c.end_at})" }.join(', '))
     end
-    user_content(msg)
+    msg
   end
   helper_method :user_content2
 

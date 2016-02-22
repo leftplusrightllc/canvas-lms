@@ -115,9 +115,9 @@ module Api::V1::DiscussionTopics
       group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
     unless opts[:exclude_messages]
       if opts[:plain_messages]
-        fields[:message] = topic.message # used for searching by body on index
+        fields[:message] = user_content2(topic) # used for searching by body on index
       else
-        fields[:message] = api_user_content(topic.message, context)
+        fields[:message] = api_user_content(user_content2(topic), context)
       end
     end
 
