@@ -1624,6 +1624,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :user_content
 
+  # customized by owen
+  def user_content2(announce)
+    msg = announce.message
+    course = announce.context
+    if course.class.name == 'Course'
+      msg = msg.gsub('{date_ini}', datetime_string(course.start_at)).gsub('{date_end}', datetime_string(course.conclude_at)).gsub('{teacher}', course.teachers.pluck(:name).join(', '))
+    end
+    user_content(msg)
+  end
+  helper_method :user_content2
+
   def find_bank(id, check_context_chain=true)
     bank = @context.assessment_question_banks.active.where(id: id).first || @current_user.assessment_question_banks.active.where(id: id).first
     if bank
