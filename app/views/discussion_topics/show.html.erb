@@ -198,7 +198,6 @@
         </header>
 
         <div class="discussion-section message_wrapper">
-        <%= @topic.context.class.name == 'Course' %>
           <div data-bind="message" class="message user_content"><%= user_content2(@topic) %></div>
           <% if @unlock_at && @unlock_at > Time.now && @topic.is_a?(Announcement) %>
             <div class="discussion-fyi">

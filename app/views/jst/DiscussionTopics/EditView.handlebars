@@ -52,6 +52,8 @@
                 style="width: 100%; min-height: 200px;">
         {{convertApiUserContent message forEditing=1}}
       </textarea>
+      <small>You can use the following shortcodes: 
+      <br>{{course_code}} {{course_name}} {{course_begin_date}} {{course_end_date}} {{teacher}} {{description}} {{format}} {{time_zone}} {{coming_up}} {{syllabus_description}} {{syllabus_assignment}} {{course_sections}} {{enroll_url}} </small>
   </div>
 
 </fieldset>
@@ -120,6 +122,15 @@
                    {{! TODO: what would be the best way to get this formatted right? }}
                    value="{{datetimeFormatted delayed_post_at}}"
                    aria-labelledby="discussion_topic_delay_post_accessible_label"
+                   data-tooltip='{"position":"top","force_position":"true"}'
+                   title="{{accessibleDateFormat}}" />
+            {{#t "post_enddelay"}}Post Until{{/t}}
+            <input type="text"
+                   class="datetime_field input-medium"
+                   name="delayed_post_end"
+                   {{! TODO: what would be the best way to get this formatted right? }}
+                   value="{{datetimeFormatted delayed_post_end}}"
+                   aria-labelledby="discussion_topic_delay_post_end_label"
                    data-tooltip='{"position":"top","force_position":"true"}'
                    title="{{accessibleDateFormat}}" />
           </label>

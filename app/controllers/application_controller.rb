@@ -1629,7 +1629,19 @@ class ApplicationController < ActionController::Base
     msg = announce.message
     course = announce.context
     if course.class.name == 'Course'
-      msg = msg.gsub('{date_ini}', datetime_string(course.start_at)).gsub('{date_end}', datetime_string(course.conclude_at)).gsub('{teacher}', course.teachers.pluck(:name).join(', '))
+      msg = msg.gsub('{{course_begin_date}}', datetime_string(course.start_at))
+        .gsub('{{course_end_date}}', datetime_string(course.conclude_at))
+        .gsub('{{teacher}}', course.teachers.pluck(:name).join(', '))
+        .gsub('{{course_name}}', course.name)
+        .gsub('{{course_code}}', course.course_code)
+        .gsub('{{description}}', course.public_description)
+        .gsub('{{format}}', course.course_format)
+        .gsub('{{time_zone}}', course.time_zone.to_s)
+        .gsub('{{syllabus_description}}', course.syllabus_body)
+        .gsub('{{syllabus_assignment}}', course.assignments.pluck(:title).join(', '))
+        .gsub('{{enroll_url}}',  enroll_url(course.self_enrollment_code))
+        .gsub('{{course_sections}}',  course.course_sections.pluck(:name).join(', '))
+        .gsub('{{coming_up}}',  course.calendar_events.where('calendar_events.start_at > ?', Time.current).map{|c| "#{c.title} (#{c.start_at}, #{c.end_at})" }.join(', '))
     end
     user_content(msg)
   end

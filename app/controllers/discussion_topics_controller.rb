@@ -828,7 +828,7 @@ class DiscussionTopicsController < ApplicationController
     @user_can_moderate
   end
 
-  API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
+  API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at delayed_post_end lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement pinned
                                 group_category_id allow_rating only_graders_can_rate sort_by_rating).freeze
 
