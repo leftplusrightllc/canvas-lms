@@ -86,6 +86,7 @@ module Api::V1::Course
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
+      hash
     end
   end
 
