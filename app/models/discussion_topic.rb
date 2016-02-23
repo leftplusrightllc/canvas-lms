@@ -69,7 +69,7 @@ class DiscussionTopic < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :message, :context_id, :context_type, :type, :user_id, :workflow_state, :last_reply_at, :created_at, :updated_at, :delayed_post_at, :posted_at, :assignment_id,
     :attachment_id, :deleted_at, :root_topic_id, :could_be_locked, :cloned_item_id, :context_code, :position, :subtopics_refreshed_at, :last_assignment_id, :external_feed_id,
-    :editor_id, :podcast_enabled, :podcast_has_student_posts, :require_initial_post, :discussion_type, :lock_at, :pinned, :locked
+    :editor_id, :podcast_enabled, :podcast_has_student_posts, :require_initial_post, :discussion_type, :lock_at, :pinned, :locked, :delayed_post_end
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:discussion_entries, :external_feed_entry, :external_feed, :context, :assignment, :attachment, :editor, :root_topic, :child_topics, :discussion_entry_participants, :user]
@@ -1055,7 +1055,7 @@ class DiscussionTopic < ActiveRecord::Base
         false
       elsif is_announcement && unlock_at = available_from_for(user)
       # unlock date exists and has passed
-        unlock_at < Time.now.utc
+        unlock_at < Time.now.utc && (self.delayed_post_end.present? ? self.delayed_post_end <= Time.now.utc : true)
       # everything else
       else
         true
