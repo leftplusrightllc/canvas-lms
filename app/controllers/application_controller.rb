@@ -1628,7 +1628,7 @@ class ApplicationController < ActionController::Base
   def user_content2(announce)
     msg = announce.message
     course = announce.context
-    if course.class.name == 'Course'
+    if course.class.name == 'Course' && !announce.disabled_shortcodes.present?
       msg = msg.gsub('{{course_begin_date}}', datetime_string(course.start_at))
         .gsub('{{course_end_date}}', datetime_string(course.conclude_at))
         .gsub('{{teacher}}', course.teachers.pluck(:name).join(', '))

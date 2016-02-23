@@ -36,7 +36,7 @@ class DiscussionTopic < ActiveRecord::Base
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
     :group_category, :allow_rating, :only_graders_can_rate, :sort_by_rating
   )
-  attr_accessor :user_has_posted, :saved_by
+  attr_accessor :user_has_posted, :saved_by, :disabled_shortcodes
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
