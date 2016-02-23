@@ -486,6 +486,11 @@ $masquerade-link-color: $ic-color-alert;
     max-height: 91px;
   }
 }
+#custom-header-logo img{
+  margin-bottom: 10px;
+  margin-top: 10px;
+  max-height: 150px;
+}
 .wrapper_navigation
 {
   background-image: url("//hsf.net/images/main-nav-bg.png");
