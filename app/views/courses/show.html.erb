@@ -200,7 +200,7 @@
 <% end %>
 
 <div id="course_home_content">
-
+  <div class='well'><%= @context.public_description %></div>
   <% if @course_home_view == 'wiki' %>
     <% js_bundle :wiki_page_show %>
     <div id="wiki_page_show"></div>
