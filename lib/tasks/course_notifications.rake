@@ -6,7 +6,7 @@ namespace :courses do
       course.enrollments.each do |e|
         m = Message.new({
                          :to => e.user.email,
-                         :subject => "Course #{course.full_name} starting today"
+                         :subject => "Course #{course.full_name} starting today",
                          :body => "Dear #{e.user.name}, the course \"#{course.full_name}\" is starting today at #{course.start_at}."
                      })
         Mailer.create_message_custom(m).deliver
