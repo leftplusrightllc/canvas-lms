@@ -42,20 +42,21 @@ class Mailer < ActionMailer::Base
     end
   end
 
-  # define in rails3-style
   def create_message_custom(m)
+    # notifications have context, bounce replies don't.
+    headers('Auto-Submitted' => m.context ? 'auto-generated' : 'auto-replied')
+
     params = {
-      from: m[:from],
-      to: m[:to],
-      subject: m[:subject]
+      from: from_mailbox(m),
+      to: m.to,
+      subject: m.subject
     }
 
-    reply_to = m[:reply_to]
+    reply_to = reply_to_mailbox(m)
     params[:reply_to] = reply_to if reply_to
-
     mail(params) do |format|
-      format.text{ render text: m[:body] }
-      format.html{ render text: m[:html_body] } if m[:html_body].present?
+      # format.text{ render text: m.body }
+      format.html{ render text: m.html_body || m.body, layout: 'layouts/layout.email' }
     end
   end
 
