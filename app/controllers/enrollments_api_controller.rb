@@ -458,7 +458,7 @@ class EnrollmentsApiController < ApplicationController
       m = Message.new({
                          :to => @current_user.email,
                          :subject => hsf_custom_config["custom_course_enrollment_subject"] || "Welcome to course", 
-                         :body => (hsf_custom_config["custom_course_enrollment_message"] || "Welcome to course #{@context.full_name}").to_s.sub("{course_name}", @context.full_name)
+                         :body => (hsf_custom_config["custom_course_enrollment_message"] || "Welcome to course #{@context.full_name}").to_s.gsub("{course_name}", @context.full_name)
                      })
       Mailer.create_message_custom(m).deliver
       render(json: enrollment_json(@current_user.self_enrollment, @current_user, session))
