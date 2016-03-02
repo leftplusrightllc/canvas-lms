@@ -2,6 +2,7 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 es: 
+  description: 'Descripción'
   1_item_scores_5512cd03: "2- Puntuaciones de los elementos"
   1st_reviewer_3c1d0119: "1er evaluador"
   2_final_score_7b0fd15e: "2. Puntuación final"

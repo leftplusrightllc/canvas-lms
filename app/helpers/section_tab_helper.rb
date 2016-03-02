@@ -1,8 +1,18 @@
 module SectionTabHelper
   def available_section_tabs(context)
-    AvailableSectionTabs.new(
+    r = AvailableSectionTabs.new(
       context, @current_user, @domain_root_account, session
     ).to_a
+    unless context.user_is_student?(@current_user, :include_future => true)
+      flag = true
+      r.each{ |i| 
+        if i[:css_class] == 'home' 
+          flag = false
+        end
+      }
+      r.unshift({:id=>-1, :label=>t('description', default: 'Description'), :css_class=>"home", :href=>:course_path}) if flag
+    end
+    r
   end
 
   def section_tabs
