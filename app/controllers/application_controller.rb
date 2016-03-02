@@ -1629,17 +1629,17 @@ class ApplicationController < ActionController::Base
     msg = announce.message.to_s
     course = announce.context
     if course.class.name == 'Course' && !announce.disabled_shortcodes.present? && msg.present?
-      msg = msg.gsub('{{course_begin_date}}', (datetime_string(course.start_at) rescue ''))
-        .gsub('{{course_end_date}}', (datetime_string(course.conclude_at) rescue ''))
+      msg = msg.gsub('{{course_begin_date}}', datetime_string(course.start_at).to_s)
+        .gsub('{{course_end_date}}', datetime_string(course.conclude_at).to_s)
         .gsub('{{teacher}}', course.teachers.pluck(:name).join(', '))
-        .gsub('{{course_name}}', (course.name rescue ''))
-        .gsub('{{course_code}}', (course.course_code rescue ''))
-        .gsub('{{description}}', (course.public_description rescue ''))
-        .gsub('{{format}}', (course.course_format rescue ''))
-        .gsub('{{time_zone}}', (course.time_zone.to_s rescue ''))
-        .gsub('{{syllabus_description}}', (course.syllabus_body rescue ''))
+        .gsub('{{course_name}}', course.name.to_s)
+        .gsub('{{course_code}}', course.course_code.to_s)
+        .gsub('{{description}}', course.public_description.to_s)
+        .gsub('{{format}}', course.course_format.to_s)
+        .gsub('{{time_zone}}', course.time_zone.to_s)
+        .gsub('{{syllabus_description}}', course.syllabus_body.to_s)
         .gsub('{{syllabus_assignment}}', course.assignments.pluck(:title).join(', '))
-        .gsub('{{enroll_url}}',  enroll_url(course.self_enrollment_code))
+        .gsub('{{enroll_url}}',  (enroll_url(course.self_enrollment_code) rescue ''))
         .gsub('{{course_sections}}',  course.course_sections.pluck(:name).join(', '))
         .gsub('{{coming_up}}',  course.calendar_events.where('calendar_events.start_at > ?', Time.current).map{|c| "#{c.title} (#{c.start_at}, #{c.end_at})" }.join(', '))
     end
