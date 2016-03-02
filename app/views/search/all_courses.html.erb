@@ -5,14 +5,23 @@
 <h1>All Courses</h1>
 <form id="course_filter" action="/search/all_courses" method="get" class="form-inline">
   <input type="search" placeholder="<%= t(:name, 'Name') %>" aria-label="<%= t(:search, 'Search') %>" name="search" value="<%= @search %>" />
-  <input type="checkbox" id="public_only" name="public_only"<%= ' checked' if @public_only %> />
+  <!-- <input type="checkbox" id="public_only" name="public_only"<%= ' checked' if @public_only %> />
   <label for="public_only">
-    <%= t(:public_only, 'Public courses only') %>
+    <%#= t(:public_only, 'Public courses only') %>
+  </label> -->
+  <input type="checkbox" id="english_course_only" name="english_course_only"<%= ' checked' if @english_course_only %> />
+  <label for="english_course_only">
+    <%= t(:english_course_only, 'English Courses') %>
   </label>
-  <input type="checkbox" id="open_enrollment_only" name="open_enrollment_only"<%= ' checked' if @open_enrollment_only %> />
+  <!-- <input type="checkbox" id="open_enrollment_only" name="open_enrollment_only"<%= ' checked' if @open_enrollment_only %> />
   <label for="open_enrollment_only">
-    <%= t(:open_enrollment_only, 'Open enrollment courses only') %>
+    <%#= t(:open_enrollment_only, 'Open enrollment courses only') %>
+  </label> -->
+  <input type="checkbox" id="spa_course_only" name="spa_course_only"<%= ' checked' if @spa_course_only %> />
+  <label for="spa_course_only">
+    <%= t(:spa_course_only, 'Spanish Courses') %>
   </label>
+
   <button type="submit"><%= t(:search, 'Search') %></button>
 </form>
 <div id="catalog_content">

@@ -197,6 +197,17 @@ class SearchController < ApplicationController
     if @open_enrollment_only
       @courses = @courses.where(open_enrollment: true)
     end
+
+    @english_course_only = params[:english_course_only]
+    if @english_course_only
+      @courses = @courses.where(locale: 'en')
+    end
+
+    @spa_course_only = params[:spa_course_only]
+    if @spa_course_only
+      @courses = @courses.where(locale: 'es')
+    end
+
     pagination_args = {}
     pagination_args[:per_page] = 12 unless request.format == :json
     ret = Api.paginate(@courses, self, '/search/all_courses/', pagination_args, {enhanced_return: true})
