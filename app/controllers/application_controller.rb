@@ -1626,18 +1626,18 @@ class ApplicationController < ActionController::Base
 
   # customized by owen
   def user_content2(announce)
-    msg = announce.message
+    msg = announce.message.to_s
     course = announce.context
-    if course.class.name == 'Course' && !announce.disabled_shortcodes.present?
-      msg = msg.gsub('{{course_begin_date}}', datetime_string(course.start_at))
-        .gsub('{{course_end_date}}', datetime_string(course.conclude_at))
+    if course.class.name == 'Course' && !announce.disabled_shortcodes.present? && msg.present?
+      msg = msg.gsub('{{course_begin_date}}', (datetime_string(course.start_at) rescue ''))
+        .gsub('{{course_end_date}}', (datetime_string(course.conclude_at) rescue ''))
         .gsub('{{teacher}}', course.teachers.pluck(:name).join(', '))
-        .gsub('{{course_name}}', course.name)
-        .gsub('{{course_code}}', course.course_code)
-        .gsub('{{description}}', course.public_description)
-        .gsub('{{format}}', course.course_format)
-        .gsub('{{time_zone}}', course.time_zone.to_s)
-        .gsub('{{syllabus_description}}', course.syllabus_body)
+        .gsub('{{course_name}}', (course.name rescue ''))
+        .gsub('{{course_code}}', (course.course_code rescue ''))
+        .gsub('{{description}}', (course.public_description rescue ''))
+        .gsub('{{format}}', (course.course_format rescue ''))
+        .gsub('{{time_zone}}', (course.time_zone.to_s rescue ''))
+        .gsub('{{syllabus_description}}', (course.syllabus_body rescue ''))
         .gsub('{{syllabus_assignment}}', course.assignments.pluck(:title).join(', '))
         .gsub('{{enroll_url}}',  enroll_url(course.self_enrollment_code))
         .gsub('{{course_sections}}',  course.course_sections.pluck(:name).join(', '))
