@@ -3,7 +3,7 @@ module SectionTabHelper
     r = AvailableSectionTabs.new(
       context, @current_user, @domain_root_account, session
     ).to_a
-    unless context.user_is_student?(@current_user, :include_future => true)
+    if context.class.name == 'Course' && !context.user_is_student?(@current_user, :include_future => true)
       flag = true
       r.each{ |i| 
         if i[:css_class] == 'home' 

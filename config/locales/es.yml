@@ -5,7 +5,6 @@ es:
   description: 'Descripción'
   english_course_only: 'Cursos en Ingles'
   spa_course_only: 'Cursos en Español'
-  browse_courses: "Examinar cursos"
   1_item_scores_5512cd03: "2- Puntuaciones de los elementos"
   1st_reviewer_3c1d0119: "1er evaluador"
   2_final_score_7b0fd15e: "2. Puntuación final"
@@ -13805,6 +13804,7 @@ es:
       menu: 
         calendar: Calendario
         grades: Calificaciones
+        browse_courses: "Examinar cursos"
       navigation: 
         main: "Navegación principal"
     profile: 
