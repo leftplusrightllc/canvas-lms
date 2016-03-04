@@ -198,13 +198,12 @@ class SearchController < ApplicationController
       @courses = @courses.where(open_enrollment: true)
     end
 
-    @english_course_only = params[:english_course_only]
-    if @english_course_only
+    @lang_course ||= 'en'
+    if @lang_course == 'en'
       @courses = @courses.where(locale: 'en')
     end
 
-    @spa_course_only = params[:spa_course_only]
-    if @spa_course_only
+    if @lang_course == 'es'
       @courses = @courses.where(locale: 'es')
     end
 

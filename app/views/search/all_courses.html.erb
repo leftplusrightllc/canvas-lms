@@ -9,7 +9,7 @@
   <label for="public_only">
     <%#= t(:public_only, 'Public courses only') %>
   </label> -->
-  <input type="checkbox" id="english_course_only" name="english_course_only"<%= ' checked' if @english_course_only %> />
+  <input type="radio" id="english_course_only" value="en" name="lang_course"<%= ' checked' if @lang_course == 'en' %> />
   <label for="english_course_only">
     <%= t(:english_course_only, 'English Courses') %>
   </label>
@@ -17,9 +17,9 @@
   <label for="open_enrollment_only">
     <%#= t(:open_enrollment_only, 'Open enrollment courses only') %>
   </label> -->
-  <input type="checkbox" id="spa_course_only" name="spa_course_only"<%= ' checked' if @spa_course_only %> />
+  <input type="radio" id="spa_course_only" value="es" name="lang_course"<%= ' checked' if @lang_course == 'es' %> />
   <label for="spa_course_only">
-    <%= t(:spa_course_only, 'Spanish Courses') %>
+    <%= t(:spa_course_only, 'Cursos en Español') %>
   </label>
 
   <button type="submit"><%= t(:search, 'Search') %></button>
