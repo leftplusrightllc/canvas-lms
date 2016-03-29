@@ -104,5 +104,8 @@ require [
     event.preventDefault()
     Backbone.history.navigate $(this).attr('href'), yes
 
-  $("iframe[height='auto']").each ->
-    $(this).css('height', $(document).height() - $(this).offset().top);  
+  check_iframe_auto_height = ->
+    $("iframe[height='auto']").each ->
+      $(this).css('height', $(document).height() - $(this).offset().top);  
+  check_iframe_auto_height()
+  setTimeout(check_iframe_auto_height, 2500)
