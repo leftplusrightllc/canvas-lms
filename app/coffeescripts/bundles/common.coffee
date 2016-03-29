@@ -103,3 +103,6 @@ require [
   $('body').on 'click', '[data-pushstate]', (event) ->
     event.preventDefault()
     Backbone.history.navigate $(this).attr('href'), yes
+
+  $("iframe[height='auto']").each ->
+    $(this).css('height', $(document).height() - $(this).offset().top);  
